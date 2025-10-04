@@ -6,6 +6,10 @@ sidebar_position: 1
 
 # 欢迎
 
-本文档会分块介绍LibXR, CodeGenerator和XRobot的环境配置、基础使用和进阶用法。有任何问题欢迎在对应仓库提交issue或者加入QQ群交流。
+QDU-Robomaster 基于 XRobot 软件框架，完成了全兵种的功能实现。此文档建立的目的是指导新队员学习，并为其他队伍提供参考。
 
-![XRobot Logo](/img/XRobot.png)
+框架文档请参考 [XRobot](https://xrobot-org.github.io/)。
+
+|                                 |                               |
+| ------------------------------- | ----------------------------- |
+| ![XRobot Logo](/img/XRobot.png) | ![XRobot Logo](/img/logo.jpg) |

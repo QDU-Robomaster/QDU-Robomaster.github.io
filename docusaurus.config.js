@@ -1,24 +1,18 @@
+// docusaurus.config.js（空模版本）
 module.exports = {
-  title: 'XRobot Docs',
-  tagline: 'Want to be the best embedded framework',
-  url: 'https://xrobot-org.github.io',
+  title: 'Docs',
+  tagline: 'Your project tagline',
+  url: 'https://QDU-Robomaster.github.io', // TODO: 站点域名
   baseUrl: '/',
   trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   onDuplicateRoutes: 'warn',
-  favicon: 'img/XRobot.png',
+  favicon: 'img/logo.jpg', // TODO: 替换站点 favicon
 
-  organizationName: 'xrobot-org',
-  projectName: 'xrobot-org.github.io',
-
-  scripts: [
-    {
-      src: 'https://static.cloudflareinsights.com/beacon.min.js',
-      defer: true,
-      'data-cf-beacon': '{"token": "8659aca76cfa4141bdd852a2f5652c32"}',
-    },
-  ],
+  // TODO: 替换为你的组织与项目名（用于 GitHub Pages 等）
+  organizationName: 'QDU-Robomaster',
+  projectName: 'QDU-Robomaster',
 
   i18n: {
     defaultLocale: 'zh',
@@ -47,9 +41,9 @@ module.exports = {
       'classic',
       {
         docs: {
-          routeBasePath: '/docs',
+          routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/xrobot-org/xrobot-org.github.io/edit/XRobot2.0/',
+          editUrl: 'https://QDU-Robomaster.github.io/edit/master/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -60,18 +54,15 @@ module.exports = {
 
   themeConfig: {
     navbar: {
-      title: 'XRobot Docs',
+      title: 'QDU Robomaster Docs',
       logo: {
-        alt: 'XRobot Logo',
-        src: 'img/XRobot.png',
+        alt: 'Site Logo',
+        src: 'img/logo.jpg', // TODO: 替换站点 Logo
       },
       items: [
+        { type: 'localeDropdown', position: 'right' },
         {
-          type: 'localeDropdown',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/xrobot-org/xrobot-org.github.io',
+          href: 'https://github.com/QDU-Robomaster', // TODO: 仓库地址（不需要可删除此项）
           label: 'GitHub',
           position: 'right',
         },
@@ -84,73 +75,12 @@ module.exports = {
         {
           title: '文档',
           items: [
-            {
-              label: '入门',
-              to: '/',
-            },
-            {
-              label: 'LibXR 类文档',
-              href: 'https://jiu-xiao.github.io/libxr/',
-            },
-            {
-              label: 'CodeGenerator命令行工具',
-              href: 'https://pypi.org/project/libxr/',
-            },
-            {
-              label: 'XRobot命令行工具',
-              href: 'https://pypi.org/project/xrobot/',
-            },
+            { label: '入门', to: '/docs/intro' }, // TODO: 确认你的首篇文档路径
           ],
         },
-        {
-          title: '社区',
-          items: [
-            {
-              label: 'GitHub仓库',
-              href: 'https://github.com/xrobot-org',
-            },
-            {
-              label: 'LibXR',
-              href: 'https://github.com/Jiu-xiao/libxr',
-            },
-            {
-              label: 'CodeGenerator',
-              href: 'https://github.com/Jiu-xiao/LibXR_CppCodeGenerator',
-            },
-            {
-              label: 'QDU Robomaster未来战队',
-              href: 'https://github.com/QDU-Robomaster',
-            }
-          ],
-        },
-        {
-          title: '媒体',
-          items: [
-            {
-              label: 'Bilibili视频教程',
-              href: 'https://space.bilibili.com/339766655/lists',
-            },
-            {
-              label: '未来战队B站频道',
-              href: 'https://space.bilibili.com/1309383975',
-            }
-          ],
-        },
-        {
-          title: '联系方式',
-          items: [
-            {
-              label: '邮箱',
-              href: 'mailto:Cong.Liu_Xiao@outlook.com',
-            },
-            {
-              label: 'QQ群: 608182228',
-              href: 'https://qm.qq.com/q/RPgE71OXmw',
-            }
-          ],
-        },
+        // 其他分栏留空或按需添加
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} XRobot`,
+      copyright: `Copyright © ${new Date().getFullYear()} QDU Robomaster`,
     },
 
     prism: {
