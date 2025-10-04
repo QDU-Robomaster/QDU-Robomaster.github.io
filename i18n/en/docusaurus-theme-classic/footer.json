@@ -1,0 +1,70 @@
+{
+  "link.title.文档": {
+    "message": "Documentation",
+    "description": "The title of the footer links column with title=文档 in the footer"
+  },
+  "link.title.社区": {
+    "message": "Community",
+    "description": "The title of the footer links column with title=社区 in the footer"
+  },
+  "link.title.媒体": {
+    "message": "Media",
+    "description": "The title of the footer links column with title=媒体 in the footer"
+  },
+  "link.title.联系方式": {
+    "message": "Contact Us",
+    "description": "The title of the footer links column with title=联系方式 in the footer"
+  },
+  "link.item.label.入门": {
+    "message": "Start here",
+    "description": "The label of footer link with label=入门 linking to /"
+  },
+  "link.item.label.LibXR 类文档": {
+    "message": "LibXR Class Document",
+    "description": "The label of footer link with label=LibXR 类文档 linking to https://jiu-xiao.github.io/libxr/"
+  },
+  "link.item.label.CodeGenerator命令行工具": {
+    "message": "CodeGenerator Command Line Tool",
+    "description": "The label of footer link with label=CodeGenerator命令行工具 linking to https://pypi.org/project/libxr/"
+  },
+  "link.item.label.XRobot命令行工具": {
+    "message": "XRobot Command Line Tool",
+    "description": "The label of footer link with label=XRobot命令行工具 linking to https://pypi.org/project/xrobot/"
+  },
+  "link.item.label.GitHub仓库": {
+    "message": "GitHub Repository",
+    "description": "The label of footer link with label=GitHub仓库 linking to https://github.com/xrobot-org"
+  },
+  "link.item.label.LibXR": {
+    "message": "LibXR",
+    "description": "The label of footer link with label=LibXR linking to https://github.com/Jiu-xiao/libxr"
+  },
+  "link.item.label.CodeGenerator": {
+    "message": "CodeGenerator",
+    "description": "The label of footer link with label=CodeGenerator linking to https://github.com/Jiu-xiao/LibXR_CppCodeGenerator"
+  },
+  "link.item.label.QDU Robomaster未来战队": {
+    "message": "QDU Robomaster Team",
+    "description": "The label of footer link with label=QDU Robomaster未来战队 linking to https://github.com/QDU-Robomaster"
+  },
+  "link.item.label.Bilibili视频教程": {
+    "message": "Bilibili Video Tutorial",
+    "description": "The label of footer link with label=Bilibili视频教程 linking to https://space.bilibili.com/339766655/lists"
+  },
+  "link.item.label.未来战队B站频道": {
+    "message": "QDU RM Team Bilibili Channel",
+    "description": "The label of footer link with label=未来战队B站频道 linking to https://space.bilibili.com/1309383975"
+  },
+  "link.item.label.邮箱": {
+    "message": "Email",
+    "description": "The label of footer link with label=邮箱 linking to mailto:Cong.Liu_Xiao@outlook.com"
+  },
+  "link.item.label.QQ群: 608182228": {
+    "message": "QQ Group: 608182228",
+    "description": "The label of footer link with label=QQ群: 608182228 linking to https://qm.qq.com/q/RPgE71OXmw"
+  },
+  "copyright": {
+    "message": "Copyright © 2025 XRobot",
+    "description": "The footer copyright"
+  }
+}

@@ -1,0 +1,214 @@
+/* ===================== */
+/*     Hero Section      */
+/* ===================== */
+.hero--primary,
+.custom-hero {
+    background: linear-gradient(135deg, #2e36c9, #9498ff);
+    /* 明亮的蓝紫渐变 */
+    color: #fff;
+    padding: 4rem 1rem;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.hero__title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.hero__subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: #f0f0f0;
+}
+
+.button.button--secondary.button--lg {
+    background-color: #ffffff;
+    color: #4e54c8;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.button.button--secondary.button--lg:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+
+/* ===================== */
+/*     Feature Cards     */
+/* ===================== */
+.features .col {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.features h3 {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.features p {
+    color: #555;
+}
+
+/* ===================== */
+/*     Version Section   */
+/* ===================== */
+.container.margin-top--lg h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #222;
+}
+
+.container.margin-top--lg ul {
+    list-style-type: none;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.container.margin-top--lg li {
+    margin-bottom: 0.5rem;
+}
+
+.container.margin-top--lg code {
+    background: #e0e7ff;
+    color: #111;
+    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.9rem;
+}
+
+/* ===================== */
+/*     Footer Custom     */
+/* ===================== */
+.footer {
+    background-color: #1e1e2f;
+    color: #ccc;
+}
+
+.footer a {
+    color: #bbb;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #fff;
+}
+
+/* =============================== */
+/*       Dark Theme Overrides     */
+/* =============================== */
+html[data-theme='dark'] {
+    /* 主色调渐变背景（暗色但科技感强） */
+    --ifm-color-primary: #8f94fb;
+    --ifm-color-primary-dark: #4e54c8;
+    --ifm-background-color: #121212;
+    --ifm-navbar-background-color: #1a1a1a;
+    --ifm-footer-background-color: #1a1a1a;
+    --ifm-footer-color: #cccccc;
+    --ifm-heading-color: #ffffff;
+    --ifm-font-color-base: #cccccc;
+}
+
+html[data-theme='dark'] .hero--primary,
+html[data-theme='dark'] .custom-hero {
+    background: linear-gradient(135deg, #555ee0, #343882);
+    color: #ffffff;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .hero__title {
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .hero__subtitle {
+    color: #cccccc;
+}
+
+html[data-theme='dark'] .button.button--secondary.button--lg {
+    background-color: #ffffff;
+    color: #1c1f4a;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme='dark'] .button.button--secondary.button--lg:hover {
+    background-color: #dddddd;
+    color: #1c1f4a;
+    transform: scale(1.05);
+}
+
+html[data-theme='dark'] .features h3 {
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .features p {
+    color: #cccccc;
+}
+
+html[data-theme='dark'] .container.margin-top--lg h2 {
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .container.margin-top--lg code {
+    background-color: #2d2d55;
+    color: #eee;
+}
+
+html[data-theme='dark'] .footer {
+    background-color: #0f0f1f;
+    color: #bbb;
+}
+
+html[data-theme='dark'] .footer a:hover {
+    color: #ffffff;
+}
+
+/* ================================ */
+/*        Themed Footer Styling     */
+/* ================================ */
+
+:root[data-theme='light'] .footer {
+    background: linear-gradient(180deg, #f5f7fa 0%, #e9edf3 100%);
+    color: #333;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme='light'] .footer a {
+    color: #444;
+}
+
+:root[data-theme='light'] .footer a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+:root[data-theme='light'] .footer__title {
+    color: #222;
+}
+
+/* 🌚 Dark Theme Footer */
+:root[data-theme='dark'] .footer {
+    background: linear-gradient(180deg, #2b2b3c 0%, #1e1e2f 100%);
+    color: #ccc;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme='dark'] .footer a {
+    color: #aaa;
+}
+
+:root[data-theme='dark'] .footer a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+:root[data-theme='dark'] .footer__title {
+    color: #eee;
+}

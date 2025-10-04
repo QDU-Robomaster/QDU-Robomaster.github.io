@@ -1,0 +1,30 @@
+.history/**
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docusaurus build output
+/build/
+
+# Local env files
+.env
+.env.local
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Dependency lock if not using yarn
+.pnp.*
+.pnp
+
+# macOS + Linux + Windows trash
+.Trashes
+*.swp
+*.swo
+.docusaurus/**
+src/data/commitInfo.json
