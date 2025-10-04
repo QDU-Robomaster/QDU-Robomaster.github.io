@@ -75,7 +75,7 @@ module.exports = {
         {
           title: '文档',
           items: [
-            { label: '入门', to: '/docs/intro' }, // TODO: 确认你的首篇文档路径
+            { label: '入门', to: '/intro' }, // TODO: 确认你的首篇文档路径
           ],
         },
         // 其他分栏留空或按需添加
