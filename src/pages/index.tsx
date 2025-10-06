@@ -22,7 +22,7 @@ export default function Home(): JSX.Element {
         <div className="animated-background" />
         <section className="hero hero--primary">
           <div className="container">
-
+          <div className="hero__logo-group">
             <motion.img
               src="/img/未来战队.png"
               alt="未来战队 Logo"
@@ -39,6 +39,7 @@ export default function Home(): JSX.Element {
               transition={{ duration: 1 }}
               style={{ width: '440px', marginBottom: '1rem'}}
             />
+          </div>
             <motion.img
               src="/img/机甲大师.png"
               alt="机甲大师 Logo"
