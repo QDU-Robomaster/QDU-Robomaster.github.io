@@ -12,4 +12,4 @@ QDU-Robomaster 基于 XRobot 软件框架，完成了全兵种的功能实现。
 
 |                                 |                               |
 | ------------------------------- | ----------------------------- |
-| ![XRobot Logo](/img/XRobot.png) | ![XRobot Logo](/img/未来战队.png) |
+| ![XRobot Logo](/img/XRobot.png) | ![XRobot Logo](/img/未来战队.jpg) |
