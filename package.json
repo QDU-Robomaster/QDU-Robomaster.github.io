@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "docusaurus start",
+    "prebuild": "node scripts/fetch-commits.js",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
     "serve": "docusaurus serve"
