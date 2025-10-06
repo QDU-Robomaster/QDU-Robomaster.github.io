@@ -51,18 +51,28 @@ export default function Home(): JSX.Element {
               src="/img/初音.png"
               alt="初音 Logo"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 ,x: '45rem' , y: '16.8rem' }}
+              animate={{ opacity: 1 ,x: '20rem' , y: '17.5rem' }}
               transition={{ duration: 1 }}
               style={{ width: '300px', marginBottom: '1rem' }}
             />
 
             <motion.h1
-              className="hero__title typewriter"
+              className="hero__title"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <Translate id="homepage.heroTitle">欢迎来到 QDU-Robomaster(初音未来战队)</Translate>
+              <span
+                className="typewriter"
+                ref={(el) => {
+                  if (el) {
+                    const textLength = el.textContent.length;
+                    el.style.setProperty('--typewriter-steps', textLength.toString());
+                  }
+                }}
+              >
+                <Translate id="homepage.heroTitle">欢迎来到 QDU-Robomaster</Translate>
+              </span>
             </motion.h1>
 
             <motion.p
@@ -151,13 +161,19 @@ export default function Home(): JSX.Element {
           <h2>
             <Translate id="homepage.versionTitle">当前文档对应仓库版本</Translate>
           </h2>
-          <ul>
-            XRobot: <code>{commitInfo.XRobot || 'N/A'}</code>{' '}
-            libxr: <code>{commitInfo.LibXR || 'N/A'}</code>{' '}
-            LibXR_CppCodeGenerator: <code>{commitInfo.CodeGen || 'N/A'}</code>
-            bsp-dev-c: <code>{commitInfo['bsp-dev-c'] || 'N/A'}</code>{' '}
-            bsp-dev-mc02: <code>{commitInfo['bsp-dev-mc02'] || 'N/A'}</code>{' '}
-            AUTO-Aming-system: <code>{commitInfo['AUTO-Aming-system'] || 'N/A'}</code>{' '}
+          <ul style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            paddingLeft: 0,
+            listStyle: 'none'
+          }}>
+            <li>XRobot: <code>{commitInfo.XRobot || 'N/A'}</code></li>
+            <li>libxr: <code>{commitInfo.LibXR || 'N/A'}</code></li>
+            <li>LibXR_CppCodeGenerator: <code>{commitInfo.CodeGen || 'N/A'}</code></li>
+            <li>bsp-dev-c: <code>{commitInfo['bsp-dev-c'] || 'N/A'}</code></li>
+            <li>bsp-dev-mc02: <code>{commitInfo['bsp-dev-mc02'] || 'N/A'}</code></li>
+            <li>AUTO-Aming-system: <code>{commitInfo['AUTO-Aming-system'] || 'N/A'}</code></li>
           </ul>
         </section>
 

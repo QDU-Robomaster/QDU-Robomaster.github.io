@@ -28,10 +28,11 @@
 
 /* 打字机效果 */
 .typewriter {
+  display: inline-block; /* 让 span 表现得像块级元素，但仍在行内 */
   overflow: hidden;
   white-space: nowrap;
-  border-right: 0.15em solid #fff;
-  animation: typing 2.5s steps(30, end);
+  border-right: 0.15em solid white; /* 光标 */
+ animation: typing 2.5s steps(var(--typewriter-steps, 30), end), blink-caret 0.75s step-end infinite;
 }
 
 @keyframes typing {
@@ -97,4 +98,55 @@ html[data-theme='light'] .features {
 /* 暗色模式下保持透明背景或现有色调 */
 html[data-theme='dark'] .features {
   background-color: transparent;
+}
+
+/* 手机竖屏适配 (屏幕宽度小于 768px) */
+@media (max-width: 768px) {
+
+  /* 调整英雄区域的内边距，使其在手机上不那么占空间 */
+  .hero.hero--primary {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* 强制所有图片在容器内居中堆叠 */
+  .hero .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* 重置所有图片的动画和定位 */
+  .hero .container motion.img,
+  .hero .container img {
+    /* 取消 framer-motion 的平移动画，让图片回归文档流 */
+    transform: none !important; 
+    position: static !important;
+    margin-bottom: 1.5rem; /* 增加图片之间的垂直间距 */
+  }
+
+  /* 调整特定图片的大小，使其在手机上更协调 */
+  .hero .container img[alt*="XRobot"] {
+    width: 280px !important;
+    order: -2; /* 将 XRobot Logo 提到最前面 */
+  }
+
+  .hero .container img[alt*="未来战队"],
+  .hero .container img[alt*="机甲大师"] {
+    width: 100px !important;
+  }
+
+  /* 在手机上隐藏背景装饰图片 */
+  .hero .container img[alt*="初音"] {
+    display: none !important;
+  }
+
+  /* 缩小标题和副标题的字体大小 */
+  .hero__title {
+    font-size: 1.5rem;
+  }
+
+  .hero__subtitle {
+    font-size: 0.7rem;
+  }
 }
