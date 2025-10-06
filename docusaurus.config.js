@@ -57,7 +57,7 @@ module.exports = {
       title: 'QDU Robomaster Docs',
       logo: {
         alt: 'Site Logo',
-        src: 'img/logo.jpg', // TODO: 替换站点 Logo
+        src: 'img/未来战队.png', // TODO: 替换站点 Logo
       },
       items: [
         { type: 'localeDropdown', position: 'right' },
