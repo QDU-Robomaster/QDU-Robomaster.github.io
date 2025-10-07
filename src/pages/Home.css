@@ -101,6 +101,26 @@ html[data-theme='dark'] .features {
   background-color: transparent;
 }
 
+/* 设置英雄区域为绝对定位的容器 */
+.hero.hero--primary {
+  position: relative;
+  overflow: hidden; /* 防止图片溢出容器边界 */
+}
+
+/* “初音”图片的绝对定位样式 */
+.hero__miku-image {
+  position: absolute;
+  bottom: 0;
+  right: 5%; /* 距离右边 5% 的位置 */
+  z-index: 0; /* 确保它在内容下方，不遮挡文字 */
+  pointer-events: none; /* 让图片不可点击，以免遮挡下方内容 */
+}
+
+.hero__logo-group {
+  display: contents;
+}
+
+
 /* 手机竖屏适配 (屏幕宽度小于 768px) */
 @media (max-width: 768px) {
 
@@ -143,14 +163,23 @@ html[data-theme='dark'] .features {
     margin-bottom: 0;
   }
 
-  /* 修改：调整组内图片的大小 */
+  .hero__logo-group {
+    display: flex;
+    flex-direction: row; /* 确保是横向排列 */
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    order: -2; /* 确保它在最顶部 */
+  }
+
+  /* 确保组内的图片大小合适 */
   .hero .container img[alt*="XRobot"] {
-    width: 180px !important; /* 调整 XRobot logo 大小 */
-    order: 0; /* 移除独立的 order */
+    width: 180px !important;
   }
 
   .hero .container img[alt*="未来战队"] {
-    width: 80px !important; /* 调整 未来战队 logo 大小 */
+    width: 80px !important;
   }
 
   /* 在手机上隐藏“机甲大师”图片 */
@@ -161,12 +190,10 @@ html[data-theme='dark'] .features {
   /* 明确标题和副标题的顺序 */
   .hero__title {
     font-size: 1.5rem;
-    order: -1; /* 紧跟在 logo 组后面 */
   }
 
   .hero__subtitle {
     font-size: 0.7rem;
-    order: 0; /* 在标题后面 */
   }
 
   /* 明确按钮组的顺序 */
@@ -174,12 +201,11 @@ html[data-theme='dark'] .features {
     order: 1;
   }
 
-  /* 在手机上显示“初音”图片并将其置于底部 */
+  /* 在手机上显示“初音”图片并将其置于按钮组下方 */
   .hero .container img[alt*="初音"] {
     display: block !important;
     width: 200px !important;
-    order: 10; /* 确保它在flex布局中排在最后 */
-    margin-top: 2rem; /* 在它和上方内容之间增加一些间距 */
+    order: 2; /* 将初音的 order 设置为 2，确保它紧跟在 order: 1 的按钮组后面 */
+    margin-top: 2rem; /* 在它和上方按钮之间增加一些间距 */
   }
-  
 }

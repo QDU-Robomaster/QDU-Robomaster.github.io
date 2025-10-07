@@ -22,7 +22,7 @@ export default function Home(): JSX.Element {
         <div className="animated-background" />
         <section className="hero hero--primary">
           <div className="container">
-          <div className="hero__logo-group">
+            <div className="hero__logo-group">
             <motion.img
               src="/img/未来战队.png"
               alt="未来战队 Logo"
@@ -39,7 +39,7 @@ export default function Home(): JSX.Element {
               transition={{ duration: 1 }}
               style={{ width: '440px', marginBottom: '1rem'}}
             />
-          </div>
+            </div>
             <motion.img
               src="/img/机甲大师.png"
               alt="机甲大师 Logo"
@@ -52,28 +52,18 @@ export default function Home(): JSX.Element {
               src="/img/初音.png"
               alt="初音 Logo"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 ,x: '20rem' , y: '17.5rem' }}
+              animate={{ opacity: 1 ,x: '20rem' , y: '17.2rem' }}
               transition={{ duration: 1 }}
               style={{ width: '300px', marginBottom: '1rem' }}
             />
 
             <motion.h1
-              className="hero__title"
+              className="hero__title typewriter"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span
-                className="typewriter"
-                ref={(el) => {
-                  if (el) {
-                    const textLength = el.textContent.length;
-                    el.style.setProperty('--typewriter-steps', textLength.toString());
-                  }
-                }}
-              >
-                <Translate id="homepage.heroTitle">欢迎来到 QDU-Robomaster</Translate>
-              </span>
+              <Translate id="homepage.heroTitle">欢迎来到 QDU-Robomaster(初音未来战队)</Translate>
             </motion.h1>
 
             <motion.p
