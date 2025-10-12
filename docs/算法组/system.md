@@ -45,13 +45,20 @@ sudo dpkg -i MvCamCtrlSDK_Runtime-4.6.1_x86_64_20250902.deb
 
 请确保已完成 [Linux 环境配置](#linux-环境配置)，包括 `xrobot` 和 `libxr` 的安装。
 
-###  克隆主仓库并初始化子模块
+### 1.克隆主仓库并初始化子模块
 
 ```bash
 git clone https://github.com/QDU-Robomaster/bsp-dev-autoaim.git
 cd bsp-dev-autoaim
 git submodule update --init --recursive
 ```
+### 2. 配置项目（使用libxr,xrobot集成）
+```bash
+xrobot_setup
+xrobot_gen_main
+```
+> 📌 上述命令将完成： 
+- 生成 XRobot 项目骨架与主函数入口
 
 ## 💻 VSC配置
 安装下列三个插件即可运行
