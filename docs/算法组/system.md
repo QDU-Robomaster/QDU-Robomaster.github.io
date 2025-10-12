@@ -23,7 +23,8 @@ sidebar_position: 1
 推荐使用 `pipx` 管理 Python 工具，避免污染系统环境：
 
 ```bash
-sudo apt install pipx
+sudo apt update 
+sudo apt install -y git python3 python3-pip cmake tar xz-utils wget pipx ninja-build libwpa-client-dev libnm-dev libudev-dev gcc g++ gdb
 sudo reboot  # 确保 PATH 生效
 pipx install xrobot libxr
 pipx ensurepath
