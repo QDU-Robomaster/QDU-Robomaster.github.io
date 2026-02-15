@@ -12,6 +12,10 @@ QDU-Robomaster 基于 XRobot 软件框架，完成了全兵种的功能实现。
 
 ## 文档导航
 
+### 全组协作
+
+1. [Git 协作指南](/git-collaboration)
+
 ### 电控组
 
 1. [电控组文档总览](/电控组/system)

@@ -4,6 +4,14 @@ title: 环境配置
 sidebar_position: 1
 ---
 
+## 🔀 协作流程（先读）
+
+算法组协作统一遵循项目级 Git 流程，请先阅读：
+
+1. [Git 协作指南](/git-collaboration)
+
+建议流程：`Roadmap Issue -> 开发分支 -> PR -> Review -> 合并`。
+
 ## 🌐 支持平台
 
 - **LibXR** 是一个纯 C++ 库，**不依赖特定操作系统**，仅需支持 **C++17 标准** 及标准库。  
