@@ -10,10 +10,11 @@ sidebar_position: 1
 ## 阅读顺序
 
 1. [Git 协作指南](/git-collaboration)
-2. [设计思想](./design-philosophy)
-3. [代码规范](./code-standard)
-4. [通信规范](./communication-standard)
-5. [快速上手](./quick-start)
+2. [算法组与电控组坐标系规范](/coordinate-system-standard)
+3. [设计思想](./design-philosophy)
+4. [代码规范](./code-standard)
+5. [通信规范](./communication-standard)
+6. [快速上手](./quick-start)
 
 ## 适用范围
 

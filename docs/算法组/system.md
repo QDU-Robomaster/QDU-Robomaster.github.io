@@ -9,6 +9,7 @@ sidebar_position: 1
 算法组协作统一遵循项目级 Git 流程，请先阅读：
 
 1. [Git 协作指南](/git-collaboration)
+2. [算法组与电控组坐标系规范](/coordinate-system-standard)
 
 建议流程：`Roadmap Issue -> 开发分支 -> PR -> Review -> 合并`。
 
