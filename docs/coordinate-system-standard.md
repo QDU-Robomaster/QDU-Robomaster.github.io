@@ -21,7 +21,7 @@ sidebar_position: 3
 
 角速度正方向遵循右手定则，分别记为 `omega_x`、`omega_y`、`omega_z`。算法组和电控组在接口中不得临时交换轴、取反轴或使用未说明的局部坐标系。
 
-![BMI088 坐标系基准](/img/bmi088-coordinate-system.svg)
+![BMI088 坐标系基准](/static/img/坐标系.png)
 
 ## 2. BMI088 安装基准
 
@@ -64,9 +64,5 @@ att_body   = attitude calculated after applying R_body_bmi
 
 如果安装包含翻面、俯仰或横滚旋转，应按实际三维安装姿态重新给出完整旋转矩阵，并在对应仓库配置或代码注释中说明。
 
-## 4. 联调检查项
-
-1. 车辆正放静止时，算法组收到的 IMU 数据必须已经处于车体坐标系。
-2. 车头朝前运动时，车体系线速度或加速度的主要正向分量应出现在 `+Y`。
-3. 绕车体上方逆时针旋转时，`omega_z` 应符合右手定则。
-4. 修改 C 板安装方向、结构固定方式或 BMI088 驱动配置后，必须重新检查 `R_body_bmi`。
+## 4. 下位机四元数计算方法
+[点击查看](https://www.andre-gaschler.com/rotationconverter/)
