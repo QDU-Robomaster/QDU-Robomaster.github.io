@@ -21,7 +21,7 @@ sidebar_position: 3
 
 角速度正方向遵循右手定则，分别记为 `omega_x`、`omega_y`、`omega_z`。算法组和电控组在接口中不得临时交换轴、取反轴或使用未说明的局部坐标系。
 
-![BMI088 坐标系基准](/static/img/坐标系.png)
+![BMI088 坐标系基准](/img/坐标系.png)
 
 ## 2. BMI088 安装基准
 
