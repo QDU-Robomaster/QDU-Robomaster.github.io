@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prepare:commit-info": "node scripts/fetch-commits.js",
+    "prestart": "npm run prepare:commit-info",
     "start": "docusaurus start",
-    "prebuild": "node scripts/fetch-commits.js",
+    "prebuild": "npm run prepare:commit-info",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
     "serve": "docusaurus serve"
