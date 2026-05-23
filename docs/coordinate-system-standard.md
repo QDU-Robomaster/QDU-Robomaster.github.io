@@ -1,11 +1,11 @@
 ---
 id: coordinate-system-standard
-title: 算法组与电控组坐标系规范
+title: 坐标系规范
 slug: /coordinate-system-standard
-sidebar_position: 3
+sidebar_position: 4
 ---
 
-# 算法组与电控组坐标系规范
+# 坐标系规范
 
 本规范定义算法组与电控组之间传递姿态、角速度、加速度、速度、位置和目标位姿时使用的坐标系约定。所有跨模块、跨板、跨仓库的数据接口均以本规范为准。
 
