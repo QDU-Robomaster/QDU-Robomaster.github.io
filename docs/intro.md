@@ -14,20 +14,33 @@ QDU-Robomaster 基于 XRobot 软件框架，完成了全兵种的功能实现。
 
 ### 全组协作
 
-1. [Git 协作指南](/git-collaboration)
-2. [算法组与电控组坐标系规范](/coordinate-system-standard)
+1. [设计思想](/design-philosophy)
+2. [整体架构](/system-architecture)
+3. [坐标系规范](/coordinate-system-standard)
+4. [Git 协作指南](/git-collaboration)
+5. [开发环境](/dev-environment)
+
+### 开发环境
+
+1. [bsp-dev-c](/dev-environment/bsp-dev-c)
+2. [bsp-dev-mc02](/dev-environment/bsp-dev-mc02)
+3. [bsp-linux-autoaim](/dev-environment/bsp-linux-autoaim)
+4. [bsp-webots-autoaim](/dev-environment/bsp-webots-autoaim)
 
 ### 电控组
 
-1. [电控组文档总览](/电控组/system)
-2. [设计思想](/电控组/design-philosophy)
-3. [代码规范](/电控组/code-standard)
-4. [通信规范](/电控组/communication-standard)
-5. [快速上手](/电控组/quick-start)
+1. [电控组文档总览](/电控组)
+2. [代码规范](/电控组/code-standard)
+3. [通信规范](/电控组/communication-standard)
+4. [快速上手](/电控组/quick-start)
 
 ### 算法组
 
-1. [算法组环境配置](/算法组/system)
+1. [算法组文档总览](/算法组)
+2. [相机同步与运行配置](/算法组/sync-and-config)
+3. [实车自瞄链路](/算法组/pipeline)
+4. [算法细节](/算法组/algorithm-details)
+5. [Webots 仿真](/算法组/webots)
 
 |                                 |                               |
 | ------------------------------- | ----------------------------- |

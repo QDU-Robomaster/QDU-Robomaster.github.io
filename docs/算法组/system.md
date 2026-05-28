@@ -1,76 +1,42 @@
 ---
-id: system
-title: 环境配置
+id: algorithm-overview
+title: 算法组文档总览
+slug: /算法组
 sidebar_position: 1
 ---
 
-## 🔀 协作流程（先读）
+# 算法组文档总览
 
-算法组协作统一遵循项目级 Git 流程，请先阅读：
+这里放算法组常用工程、运行配置和链路说明。环境安装和构建命令放在开发环境页。
 
-1. [Git 协作指南](/git-collaboration)
-2. [算法组与电控组坐标系规范](/coordinate-system-standard)
+## 1. 先读
 
-建议流程：`Roadmap Issue -> 开发分支 -> PR -> Review -> 合并`。
+1. [设计思想](/design-philosophy)
+2. [坐标系规范](/coordinate-system-standard)
+3. [开发环境](/dev-environment)
+4. [Git 协作指南](/git-collaboration)
 
-## 🌐 支持平台
+## 2. 常用仓库
 
-- **LibXR** 是一个纯 C++ 库，**不依赖特定操作系统**，仅需支持 **C++17 标准** 及标准库。  
-  ✅ 可在裸机（bare-metal）或各类 RTOS 上运行。
+1. `bsp-linux-autoaim`：实车 Linux 自瞄工程。
+2. `bsp-webots-autoaim`：Webots 自瞄仿真工程。
+3. `Modules/modules.yaml`：视觉、通信、预览等模块清单。
+4. `Modules/sources.yaml`：模块来源配置。
 
-- **CodeGenerator** 与 **XRobot** 是基于 Python 的工具包，需安装：
-  - **Python 3**
-  - **pip3**
+## 3. 目录内容
 
-> 💡 **说明**：本仓库为未来战队内部使用。鉴于电控组与算法组统一采用 **Linux 开发环境**，本文仅提供 Linux 配置指南。  
-> 更详细的教程请参阅官方文档：[XRobot 官网](https://xrobot-org.github.io/)
+1. [相机同步与运行配置](/算法组/sync-and-config)：实车、回放、采集标定三类入口，以及手眼外参写在哪里。
+2. [实车自瞄链路](/算法组/pipeline)：`CameraFrameSync -> ArmorDetector -> ArmorTracker -> Aimer` 的数据流。
+3. [算法细节](/算法组/algorithm-details)：Detector、Tracker、Aimer 的主要计算内容。
+4. [Webots 仿真](/算法组/webots)：Webots 相机、云台、裁判和发射机构怎么接入同一条自瞄链路。
 
----
+## 4. 电控接口
 
-## 🐧 Linux 环境配置
+1. 坐标系、单位、姿态字段和目标位姿含义看 [坐标系规范](/coordinate-system-standard)。
+2. Topic 名、字段语义和时间戳含义改动前，确认电控侧同步更新。
+3. 相机、串口、模型路径、回放文件和外参放在运行配置里。
 
-推荐使用 `pipx` 管理 Python 工具，避免污染系统环境：
+## 5. 开发入口
 
-```bash
-sudo apt update 
-sudo apt install -y git python3 python3-pip cmake tar xz-utils wget pipx ninja-build libwpa-client-dev libnm-dev libudev-dev gcc g++ gdb
-sudo reboot  # 确保 PATH 生效
-pipx install xrobot libxr
-pipx ensurepath
-```
-
-## 📦 外部库依赖
-### OpenCV 与 海康相机 SDK
-- 海康相机驱动下载地址:[点击前往下载页面](https://www.hikrobotics.com/cn/machinevision/service/download/?module=0)
-
-``` bash
-# 安装 OpenCV 开发库
-sudo apt install libopencv-dev
-
-# 安装海康相机运行时 SDK（请根据实际下载的文件名调整）
-sudo dpkg -i MvCamCtrlSDK_Runtime-4.6.1_x86_64_20250902.deb
-```
-
-## ⚙️ 算法组仓库配置
-
-请确保已完成 [Linux 环境配置](#linux-环境配置)，包括 `xrobot` 和 `libxr` 的安装。
-
-### 1.克隆主仓库并初始化子模块
-
-```bash
-git clone https://github.com/QDU-Robomaster/bsp-dev-autoaim.git
-cd bsp-dev-autoaim
-git submodule update --init --recursive
-```
-### 2. 配置项目（使用libxr,xrobot集成）
-```bash
-xrobot_setup
-xrobot_gen_main
-```
-> 📌 上述命令将完成： 
-- 生成 XRobot 项目骨架与主函数入口
-
-## 💻 VSC配置
-安装下列三个插件即可运行
-
-![算法插件 Logo](/img/算法插件.jpg)
+1. [`bsp-linux-autoaim` 开发环境](/dev-environment/bsp-linux-autoaim)
+2. [`bsp-webots-autoaim` 开发环境](/dev-environment/bsp-webots-autoaim)
