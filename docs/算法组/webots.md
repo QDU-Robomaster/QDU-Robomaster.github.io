@@ -2,169 +2,58 @@
 id: algorithm-webots
 title: Webots 仿真
 slug: /算法组/webots
-sidebar_position: 5
+sidebar_position: 8
 ---
 
 # Webots 仿真
 
-`bsp-webots-autoaim` 的目的不是重新写一套“仿真自瞄”，而是在可重复的虚拟环境中运行真实的 Detector、Tracker 和 Aimer 链路。
+Webots 提供场景、相机、IMU 和机构动力学。`rm_auto_aim` 作为 external controller 接入，运行 OpenVINO Detector、Tracker 和 Aimer。
 
-第一次跑通环境和 world，请从 [快速上手](/算法组/quick-start) 开始；仓库本身的环境与构建命令见 [`bsp-webots-autoaim` 开发环境](/dev-environment/bsp-webots-autoaim)。
+安装与启动步骤见[快速上手](/算法组/quick-start)。
 
-## 1. 整体链路
+## 程序怎么连接
 
 ```text
-Webots world
-    ↓
-WebotsCamera
-    ↓
-CameraSync / CameraFrameSync
-    ↓
-ArmorDetector (OpenVINO)
-    ↓
-ArmorTracker
-    ↓
-Aimer
-    ↓
-WebotsGimbal / WebotsFireNotify
+原生 Webots
+  场景、相机渲染、目标运动、云台动力学
+                    ↕ TCP
+rm_auto_aim
+  WebotsCamera → CameraFrameSync → Detector → Tracker → Aimer
+  WebotsReferee                 WebotsGimbal / WebotsFireNotify
+                    ↓
+                浏览器预览
 ```
 
-当前新人培训统一使用 OpenVINO。模型、后端和运行配置由 BSP 显式选择；环境不满足时应直接报错，而不是静默切换另一套推理路径。
+Windows 把 controller 放在 Docker 中，Linux 可以直接原生运行。Detector、Tracker、Aimer 都在同一个 controller 进程内。
 
-## 2. Webots 替换了什么
+Compose 的 `autoaim-build` 用来编译，`autoaim-preview` 用来运行无头检查。Windows 原生 GUI 路线只需要在容器中运行 controller。
 
-仿真主要替换真实世界里的设备和物理环境：
+## 文件位置
 
-| 模块 | 作用 |
+| 文件或目录 | 内容 |
 | --- | --- |
-| `WebotsCamera` | 读取 Webots 相机、陀螺仪、加速度计和姿态信息。 |
-| `CameraSync` / `CameraFrameSync` | 保留触发、同步和图像-IMU 对齐流程。 |
-| `WebotsReferee` | 提供仿真裁判信息和弹速等状态。 |
-| `WebotsGimbal` | 模拟云台动力学、执行和姿态反馈。 |
-| `WebotsFireNotify` | 把 Aimer 的发射许可转换成仿真出弹事件。 |
+| `User/xrobot.yaml` | 模块和参数 |
+| `webots/worlds/auto_aim_test_field_target_vehicle_camera_preview.wbt` | 主场景 |
+| `webots/protos/` | 目标车和装甲板模型 |
+| `webots/controllers/forced_target_simple/forced_target_simple.py` | 目标运动控制 |
+| `run_headless_preview.py` | 启动、记录和限时停止 |
 
-下面三个核心算法模块仍是正常模块：
+URL 末尾的 `self` 对应场景中的机器人名。一个机器人同一时刻只连接一个 controller。
 
-```text
-ArmorDetector
-ArmorTracker
-Aimer
-```
+## 仿真模块
 
-因此在 Webots 中改 Detector / Tracker / Aimer，和后续在真实系统里使用这些模块具有直接对应关系。
+`WebotsCamera` 获取渲染图像和 IMU；CameraSync 与 CameraFrameSync 处理触发和同步。
 
-## 3. 主要入口
+`WebotsGimbal` 接收目标角和反馈，通过控制输出驱动仿真云台。`WebotsFireNotify` 根据发射许可、延迟、射频和热量设置生成出弹事件。`WebotsReferee` 提供裁判摘要。
 
-常用位置：
+当前配置直接通过进程内 Topic 连接这些模块，没有实例化 Host/MCU 的 SharedTopic 管道桥。
 
-1. `User/xrobot.yaml`：BSP 模块实例和参数；
-2. `Modules/modules.yaml`：XRobot 模块依赖；
-3. `webots/worlds/auto_aim_test_field_target_vehicle_camera_preview.wbt`：主要 world；
-4. `webots/protos/`：目标车和装甲板等仿真实体；
-5. `run_headless_preview.py`：自动启动和 smoke test。
+## GUI 与无头运行
 
-## 4. 图像与同步
+GUI 适合观察场景、相机视角和机构运动。无头脚本使用同一个 world，在 Xvfb 环境中渲染，方便重复运行测试。
 
-Webots 相机不是预先录制的视频播放器。world 实时渲染图像，`WebotsCamera` 从相机节点获取当前图像和 IMU 状态，然后进入与正常视觉链路一致的同步接口。
+仿真步长、相机更新周期、同步周期和墙钟速度分别设置。默认相机周期为 10 ms，同步触发为 20 ms；`WEBOTS_SIM_FLOW_RATE` 设置目标仿真速度，实际速度还受渲染和推理耗时影响。
 
-默认链路保持：
+实体相机延迟、IMU 安装、USB 通信和机械误差仍需实机检查。
 
-```text
-camera image / IMU
-    ↓
-CameraFrameSync
-    ↓
-synchronized frame
-    ↓
-ArmorDetector
-```
-
-因此可以检查：
-
-- 图像时序；
-- 图像与 IMU 对齐；
-- Detector 输入；
-- Tracker 状态更新；
-- Aimer 输出；
-- 云台闭环后的新相机视角。
-
-## 5. Detector / Tracker / Aimer 预览
-
-当前 BSP 可以同时提供三路 Web 预览：
-
-```text
-/stream/armor_detector
-/stream/armor_tracker
-/stream/aimer_preview
-```
-
-新人调试时优先沿这三层观察问题：
-
-```text
-Detector 看见了吗？
-    ↓
-Tracker 跟住了吗？
-    ↓
-Aimer 给出的目标合理吗？
-```
-
-这样比一开始只看“打没打中”更容易定位问题属于感知、状态估计还是瞄准规划。
-
-## 6. Headless 与 GUI
-
-两种方式都是同一个 BSP。
-
-GUI 适合：
-
-- 新人培训；
-- 看世界和机器人运动；
-- 直观看云台响应；
-- 交互式调试。
-
-Headless 适合：
-
-- 自动 smoke test；
-- 回归测试；
-- 批量运行；
-- CI/脚本化验证。
-
-`run_headless_preview.py` 会在限定时间内要求真实 pipeline 帧出现；只有 controller 正常连接但没有 Detector 帧，不应该算通过。
-
-## 7. Webots 能验证什么
-
-适合验证：
-
-- 模块能否组合和启动；
-- OpenVINO Detector 是否正常推理；
-- Detector → Tracker → Aimer 数据链；
-- 图像 / IMU 同步关系；
-- 目标运动下的跟踪行为；
-- 云台控制响应；
-- 发射许可逻辑；
-- 可重复的回归场景。
-
-不能用它代替：
-
-- 真实相机成像差异；
-- 实际机械装配误差；
-- 真实通信链路的所有故障；
-- 最终实车性能验收。
-
-Webots 更适合作为“真实算法链路的可控软件在环环境”，而不是最终性能结论。
-
-## 8. 新人后续学习顺序
-
-建议按以下顺序：
-
-```text
-先跑通 world
-→ 看懂三路 preview
-→ 理解 User/xrobot.yaml
-→ 理解 Detector 输入输出
-→ 理解 Tracker 状态
-→ 理解 Aimer 输出
-→ 修改一个小参数并观察变化
-→ 再进入具体算法任务
-```
-
-完整的新人流程见 [快速上手](/算法组/quick-start)，仓库环境与构建命令见 [`bsp-webots-autoaim` 开发环境](/dev-environment/bsp-webots-autoaim)。
+源码：[BSP](https://github.com/QDU-Robomaster/bsp-webots-autoaim/tree/264c312fff724748784520ff4de0a22afcecd3d4)、[WebotsGimbal](https://github.com/QDU-Robomaster/WebotsGimbal/tree/8c4b62b3fe25eb40d5c6221ecca0c4f7d0f4823b)、[WebotsFireNotify](https://github.com/QDU-Robomaster/WebotsFireNotify/tree/186ff8a29d14ea329514c94847e56e876424f486)。

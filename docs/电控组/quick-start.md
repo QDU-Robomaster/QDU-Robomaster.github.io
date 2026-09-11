@@ -2,47 +2,81 @@
 id: ee-quick-start
 title: 快速上手
 slug: /电控组/quick-start
-sidebar_position: 5
+sidebar_position: 2
 ---
 
 # 快速上手
 
-下面是第一次拉起 `bsp-dev-c` 会用到的几步。STM32 编译、烧录和本地 IDE 配置按 [XRobot 官方 STM32 环境配置](https://xrobot-org.github.io/docs/env_setup/env-setup-stm32) 处理；Windows 原生 STM32 开发也是正常路径。
+先用 C 板默认的 LED 程序走一遍下载、生成、编译和烧录，再换成整车配置。
 
-## 1. 准备 Python 工具
+## 准备工具
 
-先完成 STM32 开发环境，再安装 XRobot / LibXR 的 Python 工具：
+按 [STM32 环境配置](https://xrobot-org.github.io/docs/env_setup/env-setup-stm32)安装工具链和调试工具。Windows 可以直接使用原生 STM32 开发环境。
+
+XRobot 和代码生成器装在自己的 Python 环境中：
 
 ```bash
-python -m pip install -U xrobot libxr
+python -m pip install xrobot==0.3.1 libxr
 ```
 
-## 2. 获取仓库
+这里的 Python 包 `libxr` 是代码生成工具。工程使用的 C++ 库通过 Git submodule 获取。
+
+## 拉取与初始化
 
 ```bash
 git clone https://github.com/QDU-Robomaster/bsp-dev-c.git
 cd bsp-dev-c
 git submodule update --init --recursive
-```
-
-## 3. 初始化工程
-
-```bash
 xr_cubemx_cfg -d . --xrobot
 xrobot_setup
 ```
 
-## 4. 选择机器人配置
+LibXR 位于 `Middlewares/Third_Party/LibXR/`，各模块下载到 `Modules/`。初始化完成后，生成默认入口：
 
 ```bash
-xrobot_gen_main --config User/RobotConfig/omni_infantry.yaml
+xrobot_gen_main --config User/xrobot.yaml
 ```
 
-常用机器人配置在 `User/RobotConfig/` 下，例如 `hero.yaml`、`omni_infantry.yaml`、`sentry.yaml`、`wheel_leg.yaml`。
+默认配置创建 `BlinkLED`，`blink_cycle` 为 250。生成的入口是 `User/xrobot_main.hpp`。
 
-换车或换配置后，重新执行 `xrobot_gen_main --config <yaml>`，再按官方 STM32 流程编译。
+## 编译
 
-## 5. 相关文档
+在安装好 STM32 工具的 Bash 或 Git Bash 中执行：
 
-1. [`bsp-dev-c` 开发环境](/dev-environment/bsp-dev-c)
-2. [XRobot STM32 代码生成](https://xrobot-org.github.io/docs/code_gen/stm32)
+```bash
+bash tools/build.sh --skip-format -c User/xrobot.yaml -b build/debug
+```
+
+脚本会生成入口、配置 CMake 并编译。`--skip-format` 只跳过源码格式化，方便第一次构建时保持下载下来的模块不变。
+
+构建目录中应有：
+
+```text
+build/debug/DevC.elf
+build/debug/DevC.hex
+build/debug/DevC.bin
+```
+
+使用原生 PowerShell 开发时，可按 [bsp-dev-c 环境页](/dev-environment/bsp-dev-c)配置工具链后通过 CMake 编译。
+
+## 烧录与调试
+
+连接 C 板和调试探针，在 STM32 调试工具中选择刚生成的 `DevC.elf`，确认芯片型号和 SWD 连接后下载、复位。程序启动后观察 LED。
+
+没有预期现象时，先检查是否停在断点、异常或初始化阶段。终端输出接在 USB OTG FS CDC；接线和端口名称见[外设映射](/电控组/hardware-mapping)。
+
+首次运行整车配置前，先断开电机动力，核对 CAN ID、方向和限位后再逐项通电。
+
+## 改一个参数
+
+把 `User/xrobot.yaml` 中的 `blink_cycle` 从 250 改为 500，重新生成、编译并烧录，观察 LED 周期的变化。配置改在 YAML 中，生成头文件会在下一次运行生成器时覆盖。
+
+整车配置另放在 `User/RobotConfig/`，例如：
+
+```bash
+xrobot_gen_main --config User/RobotConfig/omni_infantry_3.yaml
+```
+
+各份文件的用途见[机器人配置](/电控组/robot-configs)。
+
+源码：[默认配置](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/xrobot.yaml)、[构建脚本](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/tools/build.sh)。

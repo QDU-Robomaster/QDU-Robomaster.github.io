@@ -2,44 +2,62 @@
 id: ee-communication-standard
 title: 通信规范
 slug: /电控组/communication-standard
-sidebar_position: 4
+sidebar_position: 6
 ---
 
 # 通信规范
 
-电控通信优先沿用 XRobot / LibXR 的 Topic、Event 和 SharedTopic。新增接口先看这些机制是否已经覆盖，再考虑设备私有协议。
+模块间使用 Topic 传递数据，模式切换等动作通过 Event 连接。框架接口见 [消息系统](https://xrobot-org.github.io/docs/basic_coding/middleware/message)和[事件系统](https://xrobot-org.github.io/docs/basic_coding/middleware/event)。
 
-## 1. 通信分工
+## 主机与 C 板
 
-1. `Topic`：连续状态和数据流，例如姿态、电机状态、控制目标。
-2. `Event`：离散动作和模式切换，例如遥控器输入触发模块模式。
-3. `SharedTopic` / `SharedTopicClient`：把 Topic 数据转发到另一块板或主机。
-4. `RamFS` / `Terminal`：调试命令和状态查看入口。
-5. `CAN` / `UART`：电机、裁判系统、串口设备和板间链路。
+以 `omni_infantry_3.yaml` 和 Linux `hik.yaml` 为例，通信清单如下：
 
-## 2. 配置位置
+| 方向 | Topic | 内容 |
+| --- | --- | --- |
+| 主机 → C 板 | `target_euler` | 云台角度、角速度、角加速度 |
+| 主机 → C 板 | `fire_notify` | 发射许可 |
+| 主机 → C 板 | `camera_sync_command` | 相机同步命令 |
+| C 板 → 主机 | `gimbal_gyro`、`gimbal_accl`、`gimbal_quat` | IMU 与姿态 |
+| C 板 → 主机 | `camera_sync_result` | 触发与同步结果 |
+| C 板 → 主机 | `robot_game_ref` | 裁判摘要 |
 
-电控工程的通信关系主要看 `User/RobotConfig/*.yaml`。
+C 板使用默认 Topic 域，Linux 接收端将这些数据放入 `host` 域。
 
-1. 模块实例通过配置文件创建。
-2. 模块依赖通过配置文件连接。
-3. Topic 名、UART 名、CAN 总线名以机器人配置为准。
-4. `EventBinder` 用来连接输入事件和模块事件。
-5. SharedTopic 的串口名、收发 topic 清单也在机器人配置里。
+C 板接收侧配置：
 
-## 3. 跨组接口
+```yaml
+- id: sharedtopic
+  name: SharedTopic
+  constructor_args:
+    uart_name: usb_otg_hs_cdc
+    buffer_size: 512
+    topic_configs:
+    - target_euler
+    - fire_notify
+    - camera_sync_command
+```
 
-算法组和电控组之间共享的数据，以 [坐标系规范](/coordinate-system-standard) 为准。
+同一配置中的 `SharedTopicClient` 负责反方向发送。FS 与 HS CDC 的用途见[外设映射](/电控组/hardware-mapping)。
 
-1. 坐标系、单位、时间戳含义保持一致。
-2. Topic 名和字段语义改动前，确认两侧使用方同步更新。
-3. 串口名、相机配置、手眼外参等运行差异写在对应运行配置里。
+## SharedTopic 的几个名字
 
-## 4. 排查顺序
+`SharedTopic` 和 `SharedTopicClient` 是两个模块仓库。前者使用 `Topic::Server` 接收并解析串口数据，后者订阅本地 Topic、打包并发送。USB CDC 同样可以承载这条链路。
 
-通信异常通常按这个顺序排查：
+`LibXR::LinuxSharedTopic` 则是同机跨进程共享内存接口，与这两个串口模块不同。
 
-1. 物理链路：线束、电源、终端电阻、串口设备。
-2. 传输配置：CAN ID、UART 名、波特率。
-3. 框架配置：Topic 名、Event 绑定、SharedTopic 配置。
-4. 业务状态：模式、超时、离线保护。
+两个串口模块构造时会查找 Topic。出现 `Topic not found` 时，检查创建顺序、名称和域；接收 Topic 应在接收模块启动前创建好。
+
+## 云台目标字段
+
+当前 Aimer 将机械俯仰同时写入 `rol`、`pit`，以及各自的 `_dot`、`_ddot` 字段。实体 HostData/CMD/Gimbal 路径使用 `pit`，WebotsGimbal 使用 `rol`。偏航使用 `yaw` 一组字段。
+
+角度单位为 rad，角速度为 rad/s，角加速度为 rad/s²。这一兼容映射见 [Aimer 的发布代码](https://github.com/QDU-Robomaster/Aimer/blob/0ce19e6b6ac0a3b54680b39362f33e6780761515/AimerImpl.hpp)。
+
+## 接口变更
+
+修改 Topic 时同时检查收发两侧的类型、名称、域、单位和时间戳。异步处理还要确认消息有效期，回调中借用的指针不能直接留给另一个线程。
+
+遥控事件在机器人 YAML 的 `EventBinder` 中连接。排查模式切换时，依次看输入事件、绑定关系和 CMD 当前控制源。
+
+源码：[C 板收发配置](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/RobotConfig/omni_infantry_3.yaml)、[Linux 收发配置](https://github.com/QDU-Robomaster/bsp-linux-autoaim/blob/abef156bac8805ccccda30d092fa5979a4aef9ef/User/RunConfig/hik.yaml)。

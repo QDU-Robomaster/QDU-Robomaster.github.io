@@ -1,61 +1,67 @@
 ---
 id: algorithm-sync-and-config
-title: 相机同步与运行配置
+title: 运行配置
 slug: /算法组/sync-and-config
-sidebar_position: 2
+sidebar_position: 5
 ---
 
-# 相机同步与运行配置
+# 运行配置
 
-算法组常用入口由运行配置决定。不要把实车、回放和采集标定混成一个场景看。
+Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/RunConfig/` 中提供相机运行、文件回放和采集配置。
 
-## 1. 运行配置
+## Webots
 
-`bsp-linux-autoaim` 的常用运行配置：
-
-| 配置文件 | 用途 |
+| 项目 | 配置 |
 | --- | --- |
-| `User/RunConfig/hik.yaml` | 实车 Hik 相机运行 |
-| `User/RunConfig/capturefile.yaml` | 回放文件运行 |
-| `User/RunConfig/vision_capture.yaml` | 同步采集和标定数据 |
+| 图像 | 800×600，BGR8，step 2400 |
+| 模型 | `ArmorDetectorModel::OPENVINO_640X512` |
+| 同步模式 | `CameraFrameSyncMode::TRIGGER` |
+| 触发周期 | 20000 μs |
+| 预览端口 | 三路共用 8080 |
+| 默认弹速 | 23 m/s |
 
-`bsp-webots-autoaim` 使用 `User/xrobot.yaml` 生成入口。
+运行方式见[快速上手](/算法组/quick-start)。
 
-## 2. CameraFrameSync
+## Linux RunConfig
 
-`CameraFrameSync` 负责把图像和 IMU 对齐。实车 `hik.yaml` 默认使用 `RAW_PROBE` 模式，通过 `camera_sync_command` / `camera_sync_result` 和 C 板同步触发。
+| 文件 | 输入 | 运行内容 |
+| --- | --- | --- |
+| `User/xrobot.yaml` | Hik 相机 | 默认实体相机、自瞄和主机通信 |
+| `hik.yaml` | Hik 相机，2×2 下采样输出 720×540 | 同步、Detector、Tracker、Aimer、主机收发 |
+| `capturefile.yaml` | 1440×1080 历史视频与 IMU 文件 | 文件回放、同步、自瞄；关闭 DevC USB |
+| `sentry.yaml` | 自由运行 Hik 相机，独立标定 | 自瞄和通信，裁判输入使用 `sentry_ref` |
+| `vision_capture.yaml` | 同步相机图像 | VisionCapture 记录或标定，不运行自瞄三模块 |
 
-实车链路里，`SharedTopic` 从 C 板接收：
+`hik.yaml` 的原生标定尺寸为 1440×1080，触发目标为 100 Hz。相机参数中的自由运行帧率与外触发频率分别设置。
 
-1. `gimbal_gyro`
-2. `gimbal_accl`
-3. `gimbal_quat`
-4. `camera_sync_result`
-5. `robot_game_ref`
+上述 Linux 检测配置使用 `INT16_HEAD_L`；桌面培训使用 Webots 的 OpenVINO 配置。切换模型需要改 `cfg.network.model` 并具备对应 Runtime。
 
-`SharedTopicClient` 向 C 板发送：
+## 生成入口
 
-1. `target_euler`
-2. `fire_notify`
-3. `camera_sync_command`
+选择所需配置执行一条命令：
 
-## 3. VisionCapture
+```bash
+python3 -m xrobot.GenerateMain --config User/RunConfig/hik.yaml --output User/xrobot_main.hpp
+python3 -m xrobot.GenerateMain --config User/RunConfig/capturefile.yaml --output User/xrobot_main.hpp
+python3 -m xrobot.GenerateMain --config User/RunConfig/sentry.yaml --output User/xrobot_main.hpp
+python3 -m xrobot.GenerateMain --config User/RunConfig/vision_capture.yaml --output User/xrobot_main.hpp
+```
 
-`User/RunConfig/vision_capture.yaml` 用来采集同步图像、IMU 和标定数据。这个配置只实例化相机、同步、SharedTopic 和 `VisionCapture`，不跑 Detector、Tracker、Aimer。
+不带 `--config` 时使用 `User/xrobot.yaml`。切换后重新编译。同一工作树的生成入口共用，不能同时为两份配置运行生成器。
 
-`VisionCapture` 主要用于：
+## 常用参数位置
 
-1. 保存同步图像和 IMU 元数据。
-2. 采集相机内参标定样本。
-3. 采集手眼标定样本。
-4. 输出可填回配置的手眼外参。
+| 参数 | 位置 |
+| --- | --- |
+| 曝光、触发、下采样 | 相机实例的 `constructor_args.runtime` |
+| 同步模式、偏移和周期 | CameraFrameSync 的 `runtime` 与触发侧配置 |
+| 模型、置信度、NMS | ArmorDetector 的 `cfg.network` |
+| 跟踪与目标选择 | ArmorTracker 的 `cfg.tracker` |
+| 手眼外参 | ArmorTracker 的 `cfg.extrinsic.camera_mount_to_body` |
+| 延迟、弹道、MPC | Aimer 的 `cfg` |
+| 预览 | 对应模块的 `cfg.preview` |
+| 记录与标定 | VisionCapture 的 `cfg` |
 
-## 4. 手眼外参
+`vision_capture.yaml` 同时设置了 `mode: record` 和 `camera_calibration.enabled: true`，会进入内参标定。普通记录时需要关闭该标定开关，详细设置见[数据记录与标定](/算法组/recording-calibration)。
 
-手眼外参写在 `ArmorTracker.cfg.extrinsic.camera_mount_to_body`：
-
-1. 实车 Hik 运行：`User/RunConfig/hik.yaml`
-2. 回放运行：`User/RunConfig/capturefile.yaml`
-3. Webots 运行：`User/xrobot.yaml`
-
-这个字段表示相机安装坐标系到公开本体系的安装偏差。坐标系定义以 [坐标系规范](/coordinate-system-standard) 为准。
+源码：[Webots YAML](https://github.com/QDU-Robomaster/bsp-webots-autoaim/blob/264c312fff724748784520ff4de0a22afcecd3d4/User/xrobot.yaml)、[Linux RunConfig](https://github.com/QDU-Robomaster/bsp-linux-autoaim/tree/abef156bac8805ccccda30d092fa5979a4aef9ef/User/RunConfig)。
