@@ -7,7 +7,7 @@ sidebar_position: 3
 
 # 模块索引
 
-模块下载到 BSP 的 `Modules/` 目录。依赖清单在 `Modules/modules.yaml`，实际实例在运行 YAML 中。
+各功能模块位于 BSP 的 `Modules/` 目录。`Modules/modules.yaml` 记录依赖版本，运行 YAML 决定本次启动哪些模块以及使用什么参数。
 
 ## 相机和同步
 
@@ -33,7 +33,7 @@ sidebar_position: 3
 | `VisionCapture` | 图像记录、标定采样与内参求解 | `VisionCapture.hpp` 及采样、记录实现 |
 | `DurationStatistics` | 处理耗时统计 | 模块头文件与调用位置 |
 
-Detector、Tracker 和 Aimer 各自持有预览对象，不需要另外启动独立的预览算法进程。
+Detector、Tracker 和 Aimer 的预览直接挂在各自模块上，共用 VisionPreview 的 HTTP 服务。
 
 ## 通信与仿真
 
@@ -41,15 +41,15 @@ Detector、Tracker 和 Aimer 各自持有预览对象，不需要另外启动独
 
 Webots 使用 `WebotsReferee` 提供裁判信息，`WebotsGimbal` 控制仿真云台，`WebotsFireNotify` 处理出弹事件。连接关系见[Webots 仿真](/算法组/webots)。
 
-## 查看版本和修改
+## 版本与修改
 
-模块目录是独立仓库，进入对应模块检查：
+`Modules/` 下的模块都是独立仓库，可以直接查看版本和工作树：
 
 ```bash
 git -C Modules/ArmorDetector log -1 --oneline
 git -C Modules/ArmorDetector status --short
 ```
 
-模块实现提交到模块仓库；模型选择、设备参数和实例连接提交到 BSP。
+算法实现改在对应模块仓库；模型选择、设备参数和模块连接属于 BSP 配置。
 
 源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)、[bsp-linux-autoaim](https://github.com/QDU-Robomaster/bsp-linux-autoaim)。

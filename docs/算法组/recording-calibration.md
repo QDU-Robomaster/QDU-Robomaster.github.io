@@ -7,9 +7,9 @@ sidebar_position: 9
 
 # 数据记录与标定
 
-Linux BSP 的采集配置是 `User/RunConfig/vision_capture.yaml`，运行相机、同步、通信和 VisionCapture，不创建 Detector、Tracker、Aimer。
+Linux BSP 用 `User/RunConfig/vision_capture.yaml` 做数据采集和标定。这个配置保留相机、同步、通信与 VisionCapture，不启动 Detector、Tracker、Aimer。
 
-## 选择模式
+## 采集模式
 
 | `mode` | 功能 |
 | --- | --- |
@@ -18,7 +18,7 @@ Linux BSP 的采集配置是 `User/RunConfig/vision_capture.yaml`，运行相机
 | `calibrate_handeye` | 保存手眼标定样本，目前不求解外参 |
 | `calibrate` | 相机内参标定的旧名称 |
 
-`record` 配合 `camera_calibration.enabled: true` 也会进入内参标定。仓库里的 `vision_capture.yaml` 就是这个组合。普通记录时关闭该开关，并检查 `record.enabled`、保存图像和保存元数据的选项。
+`record` 与 `camera_calibration.enabled: true` 组合时会进入内参标定，仓库里的 `vision_capture.yaml` 默认采用这种配置。只记录数据时关闭标定开关，并按需要设置图像和元数据保存选项。
 
 修改 YAML 后重新生成和编译。
 
@@ -39,7 +39,7 @@ Linux BSP 的采集配置是 `User/RunConfig/vision_capture.yaml`，运行相机
 
 `samples.csv` 保存图像、IMU 时间戳和采样信息；`frame_geometry.csv` 保存逐帧 ROI、下采样、翻转和采样相位。`camera_info.txt` 是供旧工具使用的派生信息。
 
-当前图像目录为 `frames/`，旧说明中的 `images/` 对应较早版本。
+图像保存在 `frames/`；较早版本的记录可能使用 `images/`。
 
 相机和 IMU 时间戳分别保存。处理 CSV 时保留它们各自的时钟来源。
 
@@ -55,11 +55,11 @@ runs/camera_calib/<timestamp>_<session>_<marker>mm_<cols>x<rows>/
 
 成功后可看到 `calibration.yml`、`views.csv`、`quality_report.txt` 和 `camera_info_snippet.txt`。配置片段包含 FrameLayout 与原生 CameraCalibration。
 
-写回 YAML 前检查原生尺寸、焦距、主点、畸变和重投影误差。质量检查失败时不会生成可直接使用的配置片段。
+写回 YAML 前检查原生尺寸、焦距、主点、畸变和重投影误差。质量检查通过后再使用生成的配置片段。
 
 ## 手眼采样
 
-`calibrate_handeye` 使用已有 K/D 求 PnP，同时检查图像、IMU 姿态和运动稳定性，保存原始 IMU。求解外参需另用对应工具。
+`calibrate_handeye` 使用已有 K/D 做 PnP，同时保存图像、IMU 姿态和运动状态。采样结果交给手眼求解工具计算外参。
 
 Tracker 接收的外参位于 `cfg.extrinsic.camera_mount_to_body`，表示安装系到算法本体系的变换，旋转顺序为 wxyz，平移单位 m。坐标定义见[相机与同步](/算法组/camera-pipeline)。
 
@@ -85,6 +85,6 @@ timestamp_us,qw,qx,qy,qz,gx,gy,gz,ax,ay,az
 
 历史视频使用空的 `frame_csv_path`，由 `file_path` 和配套 IMU 文件回放。`replay_speed` 调整速度，`loop` 控制是否循环。
 
-VisionCapture 的图像目录与这种 bin 索引格式不同，回放前需要准备对应格式的文件。默认 YAML 中的历史录像路径也需要替换成自己已有的数据。
+VisionCapture 的普通图像目录和这种 bin 索引包不是同一种格式。使用 CaptureFileCamera 回放前，需要准备对应的帧索引和 IMU 文件，并把 YAML 中的示例路径换成自己的数据。
 
 源码：[VisionCapture](https://github.com/QDU-Robomaster/VisionCapture)、[CaptureFileCamera](https://github.com/QDU-Robomaster/CaptureFileCamera)。

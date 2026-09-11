@@ -7,9 +7,9 @@ sidebar_position: 11
 
 # 测试与回归
 
-以下命令在 `bsp-webots-autoaim` 根目录执行，使用已经安装 controller 依赖的 Linux 环境。Windows 可在同一个构建容器内执行。
+测试按“基础检查 → Webots 场景 → 端到端验收”三层进行。Windows 在开发容器中执行，Linux 可直接在本机执行。
 
-## 配置和启动检查
+## 基础检查
 
 ```bash
 python3 tests/config_contract_test.py
@@ -20,12 +20,12 @@ python3 tests/startup_test.py build/rm_auto_aim
 | 脚本 | 检查内容 |
 | --- | --- |
 | `config_contract_test.py` | 模型、同步、标定、生成头文件和预览配置 |
-| `launcher_test.py` | 无帧、超时、提前退出和运行错误的处理 |
-| `startup_test.py` | 真实程序对非法仿真倍率的处理 |
+| `launcher_test.py` | 无帧、超时、提前退出和运行错误 |
+| `startup_test.py` | controller 对非法仿真倍率的处理 |
 
-前两项检查项目文件或启动器逻辑，最后一项需要已编译的程序。这三条命令不需要打开场景。
+前两项不启动 Webots；`startup_test.py` 需要已经编译好的 controller。
 
-## 跑一次实际场景
+## 场景冒烟测试
 
 ```bash
 XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT \
@@ -35,19 +35,24 @@ python3 run_headless_preview.py \
   --runtime-sec 40 --sim-flow-rate 0.1 --run-root .vscode-runs
 ```
 
-脚本加载 world、连接 controller，运行 40 秒后停止。每次运行在 `.vscode-runs/` 下创建记录目录，摘要为 `99_summary.txt`。
+脚本会启动 world 和 controller，运行一段时间后自动退出。每次结果保存在 `.vscode-runs/` 下，对应目录中的 `99_summary.txt` 给出摘要。
 
-通过时应有 `status=PASS`、`runtime_errors=0` 和流水线完成帧。脚本还会检查进程是否提前退出。`detector_frames` 来自运行日志的观测，日志采样时不代表精确总帧数。
+正常结果至少包含：
 
-启动日志还应明确打印实际 OpenVINO 设备：
+```text
+status=PASS
+runtime_errors=0
+```
+
+同时应看到 Detector 持续处理帧。启动日志中的这一行可以确认实际使用的 OpenVINO 设备：
 
 ```text
 ArmorDetector loaded OpenVINO ... device=CPU|GPU|NPU input=640x512
 ```
 
-## 切换 CPU / GPU / NPU 回归
+## 推理设备回归
 
-需要确认某台 Linux 主机上的不同 OpenVINO 设备时，分别强制运行同一个场景：
+比较 CPU、GPU、NPU 时，固定同一模型、world、`sim-flow-rate` 和运行时长，只改变推理设备：
 
 ```bash
 XR_ARMOR_OPENVINO_DEVICE=CPU ...
@@ -55,23 +60,13 @@ XR_ARMOR_OPENVINO_DEVICE=GPU ...
 XR_ARMOR_OPENVINO_DEVICE=NPU ...
 ```
 
-三次测试保持同一模型、world、`sim-flow-rate` 和运行时长。每次至少确认：
+每次看五件事：模型是否加载到指定设备、Detector 是否持续出帧、Tracker / Aimer 是否正常运行、三路预览是否出首帧、`runtime_errors` 是否为 0。
 
-```text
-模型成功加载到指定 device
-→ Detector 有完成帧
-→ Tracker / Aimer 正常启动
-→ 三路 preview 出首帧
-→ runtime_errors=0
-```
+裸 ONNX 能被 `compile_model()` 加载只能说明 Runtime 接受模型；完整回归还要经过图像前处理、推理线程、后处理、Tracker 和 Aimer。
 
-只测试一个 ONNX 能否 `compile_model()` 不够，因为实际程序还包括前后处理、流水线线程、Tracker 和 Aimer。
+## 端到端验收
 
-设备不可用时应让该次测试失败，不要改成自动模式后把“成功 fallback”当作指定设备通过。
-
-## 目标与空场测试
-
-构建带观测器的程序：
+构建带观测器的 controller：
 
 ```bash
 XR_BUILD_ACCEPTANCE=ON bash docker/entrypoints/build.sh
@@ -81,7 +76,7 @@ python3 tests/run_acceptance.py \
   --case both --runtime-sec 40
 ```
 
-每次使用新的输出目录。`target` 使用带目标场景，`empty` 在独立目录中生成空场，`both` 依次运行两者。
+`target` 跑带目标场景，`empty` 跑空场，`both` 依次执行两者。每次使用新的输出目录，便于和上一轮结果对比。
 
 记录文件包括：
 
@@ -94,18 +89,16 @@ firing.tsv       发射信息
 referee.tsv      裁判摘要
 ```
 
-带目标场景还保存 `target-camera.png` 和 `target-corners.png`。各场景结果写入 `result.json`，汇总写入 `result-both.json`。
+带目标场景还会保存 `target-camera.png` 和 `target-corners.png`。单个场景结果写入 `result.json`，`both` 的汇总写入 `result-both.json`。
 
-检查内容包括共享帧身份、时间与顺序、数值有效性、角点、PnP、跟踪和命令；空场还检查误触发。
+带目标场景用于确认检测、跟踪、PnP、非零云台命令和开火链路；空场用于确认系统不会自行产生有效目标、非零命令或开火请求。
 
-Debug 构建配合软件渲染时可能明显慢于 Release。如果验收只因为观测帧数不足而失败，先增加 `--runtime-sec`，不要降低帧数门槛。延长后仍达不到要求，再查实际吞吐或卡住的阶段。
+Debug + 软件渲染的速度可能明显低于 Release。帧数不足时先延长 `--runtime-sec`，再判断是吞吐不足还是某个阶段停住。
 
-一组完整回归应该同时包含带目标和空场：带目标要求检测、跟踪、非零命令等链路成立；空场则应保持零检测或零有效跟踪、零非零命令、零开火请求。
+## 保存回归基线
 
-## 记录结果
+回归记录至少保留测试命令、BSP 与模块版本、运行 YAML、模型哈希，以及对应的 `result.json` / `99_summary.txt`。
 
-保存测试命令、BSP 与模块版本、YAML 和模型哈希。回归时保持场景和输入不变，再对比改动前后结果。
-
-这些测试用于检查功能和数据连接。识别精度、位姿误差和动态命中率需要单独的数据与统计。
+这些测试覆盖功能连接和运行稳定性。识别精度、位姿误差、动态命中率等性能指标需要单独的数据集和统计方法。
 
 源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)。

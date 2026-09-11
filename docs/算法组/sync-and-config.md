@@ -9,7 +9,7 @@ sidebar_position: 5
 
 Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/RunConfig/` 中提供相机运行、文件回放和采集配置。
 
-## Webots
+## Webots 配置
 
 | 项目 | 配置 |
 | --- | --- |
@@ -22,7 +22,7 @@ Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/R
 
 运行方式见[快速上手](/算法组/quick-start)。
 
-## Linux RunConfig
+## Linux 配置
 
 | 文件 | 输入 | 运行内容 |
 | --- | --- | --- |
@@ -34,9 +34,9 @@ Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/R
 
 `hik.yaml` 的原生标定尺寸为 1440×1080，触发目标为 100 Hz。相机参数中的自由运行帧率与外触发频率分别设置。
 
-上述 Linux 检测配置使用 `INT16_HEAD_L`；桌面培训使用 Webots 的 OpenVINO 配置。切换模型需要改 `cfg.network.model` 并具备对应 Runtime。
+Linux 实车配置使用 `INT16_HEAD_L`，Webots 桌面仿真使用 OpenVINO 模型。切换模型时同时修改 `cfg.network.model` 并准备对应 Runtime。
 
-## 生成入口
+## 生成运行入口
 
 选择所需配置执行一条命令：
 
@@ -47,9 +47,9 @@ python3 -m xrobot.GenerateMain --config User/RunConfig/sentry.yaml --output User
 python3 -m xrobot.GenerateMain --config User/RunConfig/vision_capture.yaml --output User/xrobot_main.hpp
 ```
 
-不带 `--config` 时使用 `User/xrobot.yaml`。切换后重新编译。同一工作树的生成入口共用，不能同时为两份配置运行生成器。
+省略 `--config` 时读取 `User/xrobot.yaml`。生成完成后重新编译。一个工作树共用同一份生成入口，因此一次只对应一套运行配置。
 
-## 常用参数位置
+## 参数位置
 
 | 参数 | 位置 |
 | --- | --- |
@@ -62,6 +62,6 @@ python3 -m xrobot.GenerateMain --config User/RunConfig/vision_capture.yaml --out
 | 预览 | 对应模块的 `cfg.preview` |
 | 记录与标定 | VisionCapture 的 `cfg` |
 
-`vision_capture.yaml` 同时设置了 `mode: record` 和 `camera_calibration.enabled: true`，会进入内参标定。普通记录时需要关闭该标定开关，详细设置见[数据记录与标定](/算法组/recording-calibration)。
+`vision_capture.yaml` 同时设置 `mode: record` 和 `camera_calibration.enabled: true`，用于内参标定。只做数据记录时关闭该标定开关，详细设置见[数据记录与标定](/算法组/recording-calibration)。
 
 源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)、[bsp-linux-autoaim](https://github.com/QDU-Robomaster/bsp-linux-autoaim)。

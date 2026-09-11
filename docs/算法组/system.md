@@ -1,15 +1,15 @@
 ---
 id: algorithm-overview
-title: 算法组文档总览
+title: 算法组开发指南
 slug: /算法组
 sidebar_position: 1
 ---
 
-# 算法组文档总览
+# 算法组开发指南
 
-自瞄工程的主链路是相机采集、图像与 IMU 同步、装甲板检测、目标跟踪和瞄准。Webots 与实体工程共用 Detector、Tracker、Aimer，输入和执行模块由各自 BSP 提供。
+自瞄工程从相机和 IMU 开始，经过同步、装甲板检测和目标跟踪，最后由 Aimer 生成云台目标与开火请求。Webots 和实体机器人共用 Detector、Tracker、Aimer，只在输入、通信和执行端使用不同的 BSP 模块。
 
-第一次运行从[快速上手](/算法组/quick-start)开始，使用 Webots 和 OpenVINO，不需要实体机器人。
+刚接触工程时先走一遍[快速上手](/算法组/quick-start)。Webots 可以把整条链路跑起来，不依赖实体机器人。
 
 ## 常用仓库
 
@@ -20,7 +20,7 @@ sidebar_position: 1
 
 `Modules/modules.yaml` 列出依赖，`User/xrobot.yaml` 或 `User/RunConfig/` 下的 YAML 决定实际运行配置。XRobot 的模块管理和代码生成用法见[上游文档](https://xrobot-org.github.io/docs/proj_man)。
 
-## 文档目录
+## 从哪里开始
 
 | 内容 | 页面 |
 | --- | --- |

@@ -11,7 +11,7 @@ sidebar_position: 7
 
 Detector 从同步帧取图像，经过模型前处理、推理、候选解码、NMS、语义过滤、四边形检查和 PnP，发布装甲板结果。
 
-阅读顺序：
+主要文件：
 
 | 文件 | 内容 |
 | --- | --- |
@@ -20,7 +20,7 @@ Detector 从同步帧取图像，经过模型前处理、推理、候选解码�
 | `infer/ArmorDetectorModelRegistry.hpp` | 模型枚举与工件、后端的对应 |
 | `ArmorDetectorPnPSolver.hpp` | PnP 求解 |
 
-OpenVINO 使用同步推理 worker，各输入槽分别持有请求与输出。输入繁忙导致的丢帧、推理失败和后处理失败分别统计。
+OpenVINO 推理 worker 按输入槽管理请求和输出，丢帧、推理失败、后处理失败分别计数，便于定位吞吐瓶颈。
 
 模型格式和门限说明见[模型与数据](/算法组/models-data)。
 
@@ -41,7 +41,7 @@ Tracker 用检测角点、原生标定和安装外参获得观测，再更新车
 | `max_temp_lost_count` | 暂时丢失后的保留次数 |
 | `target_select` | 各评分项的权重、归一化参数和切换裕量 |
 
-回放时间戳退回起点时，Tracker 会清除旧状态并重新建立时间基线。
+循环回放时，时间戳回到起点会触发 Tracker 清理旧状态并重新建立时间基线。
 
 ## Aimer
 
@@ -49,12 +49,12 @@ Tracker 用检测角点、原生标定和安装外参获得观测，再更新车
 
 弹道模型包含二次空气阻力，使用 RK4 积分和一维求根寻找低弹道仰角。无法求解时输出空命令。
 
-启用 MPC 后，yaw 和机械俯仰分别使用双积分模型。当前预测窗口为 100 个样本、步长 0.01 s，参考轨迹会逐步重新选择装甲面。
+启用 MPC 后，yaw 和机械俯仰分别使用双积分模型。预测窗口为 100 个样本、步长 0.01 s，参考轨迹会随预测过程重新选择装甲面。
 
 开火需要同时满足装甲面可打、计划与命中候选一致、命令稳定和云台对齐。姿态反馈来自 `host/gimbal_quat`。
 
 延迟、阻力、加速度限制和 MPC 权重在 Aimer 的 `cfg` 中配置。预览由 `AimerPreview.hpp` 投影同帧目标，不参与弹道和 MPC 计算。
 
-修改后使用[测试与回归](/算法组/testing)中的固定场景检查。识别精度、位姿误差和命中率需另用对应数据评测。
+算法改动可以先用[测试与回归](/算法组/testing)中的固定场景做功能检查；识别精度、位姿误差和命中率再用对应数据集评测。
 
 源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)、[Aimer](https://github.com/QDU-Robomaster/Aimer)。

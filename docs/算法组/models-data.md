@@ -9,7 +9,7 @@ sidebar_position: 10
 
 桌面仿真使用 `ArmorDetectorModel::OPENVINO_640X512`，模型文件在 `Modules/ArmorDetector/model/armor_detector_640x512.onnx`。
 
-## 输入输出
+## 模型格式
 
 | 项目 | 格式 |
 | --- | --- |
@@ -19,11 +19,11 @@ sidebar_position: 10
 | 前处理 | 拉伸到 640×512，BGR 转 RGB |
 | 推理设备选择 | `XR_ARMOR_OPENVINO_DEVICE` |
 
-该模型不需要额外的 NCHW 转置或归一化。
+模型直接接收 RGB uint8 输入，前处理完成尺寸调整和 BGR → RGB。
 
-## 选择 OpenVINO 设备
+## 推理设备
 
-当前实现从 OpenVINO 的 `available_devices` 中选择设备。可以显式指定：
+OpenVINO 从 `available_devices` 中选择推理设备。可以显式指定：
 
 ```bash
 XR_ARMOR_OPENVINO_DEVICE=CPU
@@ -37,13 +37,13 @@ XR_ARMOR_OPENVINO_DEVICE=NPU
 XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT
 ```
 
-不设置该变量时同样进入自动选择。当前优先级为：
+省略该变量时同样使用自动选择，优先级为：
 
 ```text
 NPU → GPU → CPU
 ```
 
-自动模式只在 OpenVINO 实际枚举出的设备中选择。显式指定某个设备时，编译模型失败会直接报错，不会再尝试其他设备。因此部署时应检查启动日志中的：
+自动模式只考虑 OpenVINO 能枚举到的设备。显式指定设备时不会做 fallback，启动日志会给出最终使用的设备：
 
 ```text
 ArmorDetector loaded OpenVINO ... device=<DEVICE> input=640x512
@@ -51,7 +51,7 @@ ArmorDetector loaded OpenVINO ... device=<DEVICE> input=640x512
 
 设备名也可以是 OpenVINO 提供的具体实例名，例如 `GPU.0`。
 
-裸模型能够在某个设备上 `compile_model()` 并不等于整条自瞄链路已经验证。更换设备后仍应至少跑一次 Webots 流水线，确认 Detector、Tracker、Aimer 和预览都正常工作。
+设备切换后再跑一次完整 Webots 流水线。`compile_model()` 只验证模型能被 Runtime 加载，前后处理、Tracker、Aimer 和预览仍需要实际运行。
 
 在 Detector 配置中选择：
 
@@ -60,19 +60,19 @@ network:
   model: {expr: ArmorDetectorModel::OPENVINO_640X512}
 ```
 
-枚举决定模型文件、输出适配和后端。Runtime 或指定设备缺失时，初始化会报错。
+模型枚举同时决定模型文件、输出适配和推理后端。
 
-## 解码与过滤
+## 后处理
 
 输出包括颜色、编号和四角点，角点顺序按 `[0,3,2,1]` 转换。`network.logit_threshold` 过滤原始 objectness logit，`min_confidence` 过滤最终置信度。
 
-后续执行 NMS、语义过滤、四边形检查和 PnP。当前 OpenVINO 路径没有独立的数字二次分类器。
+解码后依次执行 NMS、语义过滤、四边形检查和 PnP。OpenVINO 路径直接使用网络输出的编号结果。
 
 结果发布与坐标转换见[自瞄链路](/算法组/pipeline)。
 
-## 检查模型文件
+## 模型校验
 
-需要确认两台机器上的模型是否为同一份文件时，直接计算哈希，不在文档里固定某个哈希值。
+跨机器核对模型时直接计算文件哈希：
 
 Linux：
 
@@ -90,7 +90,7 @@ Get-FileHash .\Modules\ArmorDetector\model\armor_detector_640x512.onnx -Algorith
 
 ## 数据与评测
 
-仓库提供推理代码和模型文件，这套文档尚未提供配套训练脚本和训练集。
+仓库包含推理代码和模型文件；训练脚本和训练集由训练流程单独管理。
 
 回放使用的视频、IMU、标定和帧几何应配套。文件格式见[数据记录与标定](/算法组/recording-calibration)。
 
