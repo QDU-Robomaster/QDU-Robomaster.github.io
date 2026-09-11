@@ -85,15 +85,9 @@ docker exec -it qdu-autoaim-dev bash
 xrobot_setup
 ```
 
-完成后应能看到 `Modules/ArmorDetector/`、`Modules/ArmorTracker/`、`Modules/Aimer/` 等目录。
+完成后应能看到 `Modules/ArmorDetector/`、`Modules/ArmorTracker/`、`Modules/Aimer/` 等目录。`xrobot_setup` 会同时生成当前入口文件；后续 CMake 也会在 YAML 变化时自动重新生成。
 
-生成入口：
-
-```bash
-python3 -m xrobot.GenerateMain --output User/xrobot_main.hpp
-```
-
-`User/xrobot_main.hpp` 是生成文件，不要手改。
+`User/xrobot_main.hpp` 和 `User/xrobot_constexpr.hpp` 都是生成文件，不要手改。
 
 ### 5. 第一次编译
 
@@ -176,24 +170,42 @@ Ctrl+Shift+P
 
 ### VS Code 里怎么编译
 
-仓库已经有一套 task：
+首次完成 `xrobot_setup` 后，仓库的 CMake Tools 配置会在打开工程时自动 configure：
+
+```text
+source      /workspace
+build       /workspace/build/debug
+generator   Ninja
+build type  Debug
+```
+
+因此 VS Code 底部状态栏或 CMake Tools 面板里的 **Build** 按钮可以直接使用。它会使用 Ninja 并行构建；不再要求先手工选择 kit 或 preset。
+
+CMake 还会跟踪：
+
+```text
+User/xrobot.yaml
+Modules/modules.yaml
+```
+
+这些配置变化后，普通 CMake build 会先自动执行 XRobot 入口生成，再编译 `rm_auto_aim`。所以改 YAML 后也不需要再手工运行 `python3 -m xrobot.GenerateMain`。
+
+如果希望明确执行完整流程，也可以继续使用仓库 task：
 
 ```text
 Ctrl+Shift+B
 → Build: Webots debug
 ```
 
-它会按顺序做：
+它会显式执行：
 
 ```text
-生成 User/xrobot_main.hpp
+生成 XRobot 入口
 → configure build/debug
-→ cmake --build ... --parallel 24
+→ 并行编译 rm_auto_aim
 ```
 
-这条是目前 VS Code 里的推荐编译入口。
-
-**不要把 CMake Tools 自带的 Build 按钮当成同一件事。** 它只执行 CMake 自己的 configure/build，不负责先生成 XRobot 入口，而且当前工程的 CMake Tools 状态/kit 也不作为新人流程的一部分。出现报错时直接用上面的 task，或者在 Terminal 中执行本页的 `cmake` 命令。
+两种入口最终使用同一个 `build/debug`。第一次打开工程时如果 CMake Tools 仍在 configure，等状态栏完成后再点 Build。
 
 ## 手动打开 Webots
 
@@ -326,16 +338,17 @@ Ctrl+Shift+P
 
 ### 改了 YAML
 
-先重新生成入口，再编译：
+直接 build 即可：
 
 ```bash
-python3 -m xrobot.GenerateMain --output User/xrobot_main.hpp
 cmake --build build/debug \
   --target rm_auto_aim \
   --parallel "$(nproc)"
 ```
 
-如果同时改了 CMakeLists、增加了源文件，重新执行 configure 后再 build。
+CMake 会发现 `User/xrobot.yaml` 更新，先自动重新生成 `User/xrobot_main.hpp` 和 `User/xrobot_constexpr.hpp`，再继续编译。VS Code 的 CMake Tools **Build** 按钮和 `Ctrl+Shift+B → Build: Webots debug` 也都会得到同样的生成结果。
+
+如果同时改了 CMakeLists、增加了源文件，CMake Tools 会重新 configure；命令行使用时重新执行一次前面的 `cmake -S ... -B ...` 即可。
 
 ### 重新运行
 
@@ -364,7 +377,6 @@ git clone https://github.com/QDU-Robomaster/bsp-webots-autoaim.git
 cd bsp-webots-autoaim
 git submodule update --init --recursive
 xrobot_setup
-python3 -m xrobot.GenerateMain --output User/xrobot_main.hpp
 
 cmake -S . -B build/debug -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug \
@@ -394,6 +406,10 @@ export QT_QPA_PLATFORM=offscreen
 ```
 
 Linux 主机如果同时有 NPU、GPU 和 CPU，自动模式优先 `NPU → GPU → CPU`。启动后仍以 `ArmorDetector loaded OpenVINO ... device=...` 为准。
+
+如果你的电脑使用较新的 Intel 处理器，尤其是 Core Ultra 这类平台，通常同时带 Intel 核显，部分型号还带 NPU。驱动和 OpenVINO Runtime 安装正确时，`AUTO_DETECT` 很可能可以直接使用 `GPU` 或 `NPU`，不必把推理固定在 CPU。GPU/NPU 对这个视觉模型通常能显著降低推理耗时，也会减少 controller 对仿真速度的拖累；在硬件和场景合适时，Webots + 自瞄整条链路可以运行到接近实时的程度。
+
+实际能否达到实时仍受 GPU/NPU 型号、驱动、Webots 渲染负载和场景复杂度影响。先看启动日志确认真正使用了哪个设备，再观察实际仿真速度；不要只根据 CPU 型号判断。
 
 重复测试或 CI 再使用 `run_headless_preview.py`，日常新人上手先把上面的 GUI + 手工 controller 路线跑通。
 
