@@ -7,187 +7,316 @@ sidebar_position: 2
 
 # 快速上手
 
-Windows 使用原生 Webots 显示场景，在 Docker 内开发和运行 controller。Linux 可以把 Webots 和 controller 都装在本机。两种方式都使用 OpenVINO。
-
-这页按实际开发顺序写：先跑起来，再用 VS Code 打开工程、确认代码跳转和补全正常，最后改代码、重新编译和重新运行。
+Windows 下推荐用原生 Webots 显示场景，用 Docker 提供 Linux 编译和运行环境。Docker 容器手动启动，编译、运行 controller 等命令都在容器终端里执行。
 
 ## Windows
 
-### 安装工具
+### 1. 安装工具
 
-安装：
+先安装：
 
 - [Git](https://git-scm.com/downloads)
 - [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)，使用 Linux containers
 - [Webots](https://cyberbotics.com/doc/guide/installation-procedure)
 - [VS Code](https://code.visualstudio.com/)
-- VS Code 的 **Dev Containers** 扩展
 
-打开 PowerShell 检查：
+VS Code 至少安装这些扩展：
 
-```powershell
-git --version
-docker version
-docker compose version
-& "$env:ProgramFiles\Webots\msys64\mingw64\bin\webots.exe" --version
-code --version
+```text
+Dev Containers
+XRobot                 xrobot.xrobot
+CMake Tools            ms-vscode.cmake-tools
+clangd                 llvm-vs-code-extensions.vscode-clangd
 ```
 
-Docker 应显示 Server 信息。Webots 装在其他位置时，替换命令中的路径；`code` 命令不可用时，也可以从 VS Code 的 **File → Open Folder** 打开工程。
+仓库还推荐 Python、Docker 和调试扩展，可以直接安装 Workspace Recommendations。
 
-### 拉取工程和初始化模块
+### 2. 拉取工程
+
+PowerShell：
 
 ```powershell
 git clone --config core.autocrlf=false https://github.com/QDU-Robomaster/bsp-webots-autoaim.git
 cd bsp-webots-autoaim
 git submodule update --init --recursive
-
-docker compose build
-docker compose run --rm -e XR_FORCE_XROBOT_SETUP=1 autoaim-build
 ```
 
-`libxr/` 由 Git submodule 下载，`Modules/` 由 XRobot 下载。首次构建带上 `XR_FORCE_XROBOT_SETUP=1`，把模块准备好；后面不需要每次重复这一步。
+`libxr/` 是 Git submodule；`Modules/` 后面由 XRobot 下载。
 
-### 用 VS Code 打开工作区
+### 3. 构建并启动开发容器
 
-在仓库根目录执行：
+仍然在仓库根目录：
 
 ```powershell
-code .
+docker build -t bsp-webots-autoaim-webots:local .\docker
 ```
 
-VS Code 打开后按 `Ctrl+Shift+P`，执行：
+第一次创建开发容器：
+
+```powershell
+docker run -d `
+  --name qdu-autoaim-dev `
+  -p 8080:8080 `
+  -v "${PWD}:/workspace" `
+  -w /workspace `
+  bsp-webots-autoaim-webots:local `
+  sleep infinity
+```
+
+以后不用重新 `docker run`，启动已有容器即可：
+
+```powershell
+docker start qdu-autoaim-dev
+```
+
+进入容器：
+
+```powershell
+docker exec -it qdu-autoaim-dev bash
+```
+
+下面没有特别说明的 Linux 命令，都在这个容器终端中执行。
+
+### 4. 初始化 XRobot 模块
+
+第一次进入工程执行：
+
+```bash
+xrobot_setup
+```
+
+完成后应能看到 `Modules/ArmorDetector/`、`Modules/ArmorTracker/`、`Modules/Aimer/` 等目录。
+
+生成入口：
+
+```bash
+python3 -m xrobot.GenerateMain --output User/xrobot_main.hpp
+```
+
+`User/xrobot_main.hpp` 是生成文件，不要手改。
+
+### 5. 第一次编译
+
+先 configure：
+
+```bash
+cmake -S . -B build/debug -G Ninja \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  -DAUTO_AIM_PREVIEW_IMAGE=ON
+```
+
+再并行编译：
+
+```bash
+cmake --build build/debug \
+  --target rm_auto_aim \
+  --parallel "$(nproc)"
+```
+
+生成：
 
 ```text
-Dev Containers: Reopen in Container
+build/debug/rm_auto_aim
+build/debug/compile_commands.json
 ```
 
-第一次进入会构建并启动开发容器。完成后，VS Code 左下角应显示当前窗口已经在 Dev Container 中。
+不要漏掉 `--parallel`。第一次完整 Debug 编译比较重，不并行会明显变慢。
 
-仓库会在容器里安装推荐扩展，包括 CMake Tools、clangd、XRobot、Python 和调试插件。这个项目的 C/C++ 补全由 **clangd** 提供，仓库设置已经关闭 Microsoft C/C++ 扩展自己的 IntelliSense，避免两套语言服务同时工作。
+## VS Code
 
-### 第一次 Debug 构建
+### 连接到刚才的容器
 
-clangd 需要 `compile_commands.json` 才能正确理解头文件、宏和编译参数。进入 Dev Container 后先执行一次：
+Windows 上打开 VS Code，按 `Ctrl+Shift+P`：
 
 ```text
-Ctrl+Shift+B
-→ Build: Webots debug
+Dev Containers: Attach to Running Container...
 ```
 
-这个任务会依次：
+选择：
 
 ```text
-重新生成 User/xrobot_main.hpp
-→ CMake configure 到 build/debug
-→ 编译 build/debug/rm_auto_aim
-→ 生成 build/debug/compile_commands.json
+qdu-autoaim-dev
 ```
 
-构建完成后等 clangd 完成后台索引。可以用下面两个动作确认智能提示不是“假正常”：
+然后在这个 VS Code 窗口中打开：
 
-1. 打开 `User/main.cpp`，在 `XRobotMain` 上按 `F12`，应能跳到生成的入口；
-2. 打开 `Modules/ArmorDetector/ArmorDetector.hpp`，类型和头文件应能正常跳转，不应整页提示找不到 include。
+```text
+/workspace
+```
 
-如果刚生成 `compile_commands.json` 仍有旧诊断，执行：
+扩展需要安装在容器侧。确认 XRobot、clangd 和 CMake Tools 在当前 Dev Container 中已经启用。
+
+### clangd 第一次会比较慢
+
+这个工程的 C/C++ 补全使用 clangd，不使用 Microsoft C/C++ IntelliSense。clangd 读取：
+
+```text
+build/debug/compile_commands.json
+```
+
+所以必须至少完成一次上面的 Debug configure + build，再看代码补全。
+
+Windows bind mount 下第一次 background index 可能超过一分钟。刚打开文件时暂时不能跳转并不一定是配置错误，先看 VS Code 状态栏里的 clangd 是否仍在 indexing。
+
+索引完成后可以检查：
+
+- `User/main.cpp` 中的 `XRobotMain` 能否 `F12` 跳转；
+- `Modules/ArmorDetector/ArmorDetector.hpp` 中的类型能否正常跳转；
+- include 是否不再整页报红。
+
+如果 `build/debug/compile_commands.json` 已经存在，但索引长期没有恢复，再执行：
 
 ```text
 Ctrl+Shift+P
 → clangd: Restart language server
 ```
 
-仓库的 clangd 配置固定读取 `build/debug/compile_commands.json`。因此 Windows 下不要在宿主机直接用 clangd 去读取 Docker 生成的 `/workspace/...` 编译路径；代码编辑也放在 Dev Container 窗口里完成。
+不要在 Windows 宿主机上直接让 clangd 读取这份数据库；里面的编译路径是 `/workspace/...`，应该在容器里的 VS Code 中使用。
 
-### 打开 Webots 场景
+### VS Code 里怎么编译
 
-Webots 仍然运行在 Windows，而不是 Dev Container 里。
-
-在 Windows PowerShell 中、仓库根目录执行：
-
-```powershell
-& "$env:ProgramFiles\Webots\msys64\mingw64\bin\webots.exe" `
-  --port=1235 --stdout --stderr --mode=fast --extern-urls `
-  .\webots\worlds\auto_aim_test_field_target_vehicle_camera_preview.wbt
-```
-
-场景加载后，会等待名为 `self` 的 external controller。保持 Webots 打开。
-
-### 从 VS Code 运行 controller
-
-回到 **Dev Container 里的 VS Code Terminal**：
-
-```bash
-WEBOTS_CONTROLLER_URL=tcp://host.docker.internal:1235/self \
-WEBOTS_SIM_FLOW_RATE=0.1 \
-XR_ARMOR_OPENVINO_DEVICE=CPU \
-./build/debug/rm_auto_aim
-```
-
-`host.docker.internal` 是容器访问 Windows 宿主机的地址。当前 Windows Docker 开发环境通常只把 CPU 暴露给 OpenVINO，因此这里显式选择 `CPU`。这里先用较低的仿真速度，运行稳定后再调整 `WEBOTS_SIM_FLOW_RATE`。
-
-OpenVINO 设备通过 `XR_ARMOR_OPENVINO_DEVICE` 选择：
-
-```text
-CPU          强制 CPU
-GPU          强制 GPU
-NPU          强制 NPU
-AUTO_DETECT  自动选择
-```
-
-不设置这个变量与 `AUTO_DETECT` 等价。当前自动优先级为：
-
-```text
-NPU → GPU → CPU
-```
-
-显式指定某个设备时，如果该设备不可用，初始化会直接报错，不会静默切换到其他设备。启动日志会打印实际加载设备，例如：
-
-```text
-ArmorDetector loaded OpenVINO ... device=CPU input=640x512
-```
-
-因此不要仅根据机器“应该有 GPU/NPU”判断实际推理设备，以这行日志为准。
-
-三路预览在容器的 8080 端口。VS Code 底部打开 **Ports** 面板，选择 **Forward a Port**，输入：
-
-```text
-8080
-```
-
-然后直接打开 VS Code 显示的 Local Address。页面应包含 Detector、Tracker 和 Aimer 三路预览。
-
-日志应能看到 OpenVINO 模型加载，随后持续出现检测、跟踪和瞄准结果。
-
-## 修改代码、编译和重新运行
-
-### 改哪里
-
-常用位置：
-
-```text
-User/xrobot.yaml        模块实例和参数
-Modules/ArmorDetector/  检测
-Modules/ArmorTracker/   跟踪
-Modules/Aimer/          瞄准与弹道
-webots/                 场景和仿真资源
-```
-
-不要手改 `User/xrobot_main.hpp`。它是从 YAML 生成的，下次生成会覆盖手工修改。
-
-### 改 YAML 或模块连接
-
-修改 `User/xrobot.yaml` 后执行：
+仓库已经有一套 task：
 
 ```text
 Ctrl+Shift+B
 → Build: Webots debug
 ```
 
-这个任务会重新生成入口、重新 configure 并编译。
+它会按顺序做：
+
+```text
+生成 User/xrobot_main.hpp
+→ configure build/debug
+→ cmake --build ... --parallel 24
+```
+
+这条是目前 VS Code 里的推荐编译入口。
+
+**不要把 CMake Tools 自带的 Build 按钮当成同一件事。** 它只执行 CMake 自己的 configure/build，不负责先生成 XRobot 入口，而且当前工程的 CMake Tools 状态/kit 也不作为新人流程的一部分。出现报错时直接用上面的 task，或者在 Terminal 中执行本页的 `cmake` 命令。
+
+## 手动打开 Webots
+
+不需要用 PowerShell 命令启动 Webots。
+
+1. 从开始菜单打开 Webots；
+2. 选择 **File → Open World...**；
+3. 打开：
+
+```text
+webots/worlds/auto_aim_test_field_target_vehicle_camera_preview.wbt
+```
+
+4. 点击工具栏的运行按钮。
+
+场景中的机器人 `self` 使用 `<extern>` controller。Webots Console 会显示 external controller 地址，例如：
+
+```text
+ipc://1234/self
+tcp://<ip_address>:1234/self
+```
+
+记住这里显示的端口。端口不一定必须写成 1234/1235，以 Webots 当前打印的值为准。
+
+Webots 保持打开，controller 停止后它会继续等待下一次连接。
+
+## 运行 controller
+
+回到容器终端。**不要直接执行二进制**，先把运行环境变量写好。
+
+假设 Webots Console 显示端口 1234：
+
+```bash
+export WEBOTS_CONTROLLER_URL=tcp://host.docker.internal:1234/self
+export WEBOTS_SIM_FLOW_RATE=0.1
+export XR_ARMOR_OPENVINO_DEVICE=CPU
+export QT_QPA_PLATFORM=offscreen
+```
+
+然后再运行：
+
+```bash
+./build/debug/rm_auto_aim
+```
+
+其中：
+
+| 变量 | 作用 |
+| --- | --- |
+| `WEBOTS_CONTROLLER_URL` | Docker 中的 controller 连接 Windows Webots |
+| `WEBOTS_SIM_FLOW_RATE` | 仿真运行倍率 |
+| `XR_ARMOR_OPENVINO_DEVICE` | OpenVINO 推理设备 |
+| `QT_QPA_PLATFORM` | 容器中不弹本地图形窗口 |
+
+Windows 当前这套 Docker 环境使用 CPU：
+
+```bash
+export XR_ARMOR_OPENVINO_DEVICE=CPU
+```
+
+OpenVINO 还支持：
+
+```text
+GPU
+NPU
+AUTO_DETECT
+```
+
+`AUTO_DETECT` 的顺序是：
+
+```text
+NPU → GPU → CPU
+```
+
+显式指定某个设备而该设备不可用时，会直接报错，不会偷偷换到 CPU。
+
+启动后看日志确认实际设备：
+
+```text
+ArmorDetector loaded OpenVINO ... device=CPU input=640x512
+```
+
+## 看预览
+
+Docker 启动时已经把容器 8080 映射到 Windows：
+
+```text
+http://127.0.0.1:8080/
+```
+
+页面中应有：
+
+```text
+Detector
+Tracker
+Aimer
+```
+
+VS Code 在连接容器后通常也会自动发现监听端口，并在 **Ports** 面板中显示 8080。正常情况下不用手工再点 `Forward a Port`；如果没有自动出现，再手动添加即可。
+
+## 修改、编译、重新运行
+
+常用代码位置：
+
+```text
+User/xrobot.yaml        模块实例和参数
+Modules/ArmorDetector/  检测
+Modules/ArmorTracker/   跟踪
+Modules/Aimer/          瞄准与弹道
+webots/                 world、PROTO 和仿真资源
+```
 
 ### 只改 C++
 
-只修改 `Modules/...` 下的 C++，且没有改 CMake 或 YAML 时，可以少跑两步：
+不用重新 configure：
+
+```bash
+cmake --build build/debug \
+  --target rm_auto_aim \
+  --parallel "$(nproc)"
+```
+
+或者：
 
 ```text
 Ctrl+Shift+P
@@ -195,127 +324,81 @@ Ctrl+Shift+P
 → CMake: build Webots debug
 ```
 
-如果增加了源文件、改了 CMake 或不确定构建状态，直接重新执行完整的 `Build: Webots debug`。
+### 改了 YAML
+
+先重新生成入口，再编译：
+
+```bash
+python3 -m xrobot.GenerateMain --output User/xrobot_main.hpp
+cmake --build build/debug \
+  --target rm_auto_aim \
+  --parallel "$(nproc)"
+```
+
+如果同时改了 CMakeLists、增加了源文件，重新执行 configure 后再 build。
 
 ### 重新运行
 
-controller 正在运行时，先在 VS Code Terminal 中按 `Ctrl+C`。Webots 场景可以保持打开，它会重新等待 external controller。
+正在运行的 controller 在终端中按：
 
-编译完成后再次执行：
+```text
+Ctrl+C
+```
+
+Webots 不用关。
+
+如果仍在同一个 shell，前面 `export` 的环境变量还在，直接：
 
 ```bash
-WEBOTS_CONTROLLER_URL=tcp://host.docker.internal:1235/self \
-WEBOTS_SIM_FLOW_RATE=0.1 \
-XR_ARMOR_OPENVINO_DEVICE=CPU \
 ./build/debug/rm_auto_aim
 ```
 
-不需要每改一行代码就重新 `docker compose build`，也不需要重新打开 Webots。
-
-想单步调试时，可以使用 VS Code 的 **Run and Debug**，选择仓库已有的 `Webots: Debug controller (paste extern URL)` 配置；Windows + Dev Container 下输入：
-
-```text
-tcp://host.docker.internal:1235/self
-```
-
-该调试配置会先执行 Debug 构建。
+如果重新开了一个 `docker exec` shell，要重新执行那几条 `export`。
 
 ## Linux 原生运行
 
-### 安装依赖
-
-安装 Git、CMake、Ninja、C++ 编译器、Python/venv、Webots、OpenCV C++ 开发库和 OpenVINO C++ Runtime。
-
-例如 Debian/Ubuntu 系统先准备基础工具：
-
-```bash
-sudo apt update
-sudo apt install -y git cmake ninja-build g++ python3 python3-venv xvfb xauth
-python3 -m venv "$HOME/.venvs/qdu-xrobot"
-. "$HOME/.venvs/qdu-xrobot/bin/activate"
-python3 -m pip install xrobot
-```
-
-Webots、OpenCV 和 OpenVINO 按各自官方安装方式安装。如果 OpenVINO 不在 CMake 默认搜索路径，设置 `OpenVINO_DIR` 指向实际的 `runtime/cmake`：
-
-```bash
-export OpenVINO_DIR="/path/to/openvino/runtime/cmake"
-```
-
-Webots 不在默认位置时，同样设置：
-
-```bash
-export WEBOTS_HOME="/path/to/webots"
-```
-
-### 拉取工程
+Linux 不需要 Docker 时，编译命令和上面基本一样。先安装 Git、CMake、Ninja、C++ 编译器、Python、Webots、OpenCV C++ 开发库和 OpenVINO C++ Runtime，再执行：
 
 ```bash
 git clone https://github.com/QDU-Robomaster/bsp-webots-autoaim.git
 cd bsp-webots-autoaim
 git submodule update --init --recursive
 xrobot_setup
+python3 -m xrobot.GenerateMain --output User/xrobot_main.hpp
+
+cmake -S . -B build/debug -G Ninja \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  -DAUTO_AIM_PREVIEW_IMAGE=ON
+
+cmake --build build/debug \
+  --target rm_auto_aim \
+  --parallel "$(nproc)"
 ```
 
-### 用 VS Code 打开
-
-建议从已经配置好 OpenVINO / Webots 环境变量的终端启动 VS Code：
+Webots 仍可按 GUI 手动打开同一个 `.wbt`。然后在运行 controller 的终端中设置：
 
 ```bash
-code .
+export WEBOTS_CONTROLLER_URL=tcp://127.0.0.1:1234/self
+export WEBOTS_SIM_FLOW_RATE=0.1
+export XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT
+export QT_QPA_PLATFORM=offscreen
 ```
 
-安装仓库推荐扩展后，执行：
+端口按 Webots Console 实际显示修改。
 
-```text
-Ctrl+Shift+B
-→ Build: Webots debug
-```
-
-同样会生成 `build/debug/compile_commands.json`，clangd 会从这个目录建立索引。打开 `User/main.cpp` 用 `F12` 测一下跳转，再开始改代码。
-
-如果你的 Webots 不在仓库默认路径，VS Code task 使用的环境也必须能看到正确的 `WEBOTS_HOME`；最简单的方法就是从已经 export 好变量的终端执行 `code .`。
-
-### 打开场景和 controller
-
-终端 1：
+运行：
 
 ```bash
-webots --port=1235 --stdout --stderr --mode=fast --extern-urls \
-  webots/worlds/auto_aim_test_field_target_vehicle_camera_preview.wbt
-```
-
-终端 2：
-
-```bash
-WEBOTS_CONTROLLER_URL=tcp://127.0.0.1:1235/self \
-WEBOTS_SIM_FLOW_RATE=0.1 \
-XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT \
 ./build/debug/rm_auto_aim
 ```
 
-Linux 主机如果同时具备 NPU、GPU 和 CPU，自动模式会依次尝试选择 `NPU → GPU → CPU` 中第一个可用设备。需要做对照测试或固定部署设备时，直接改成 `CPU`、`GPU` 或 `NPU`。
+Linux 主机如果同时有 NPU、GPU 和 CPU，自动模式优先 `NPU → GPU → CPU`。启动后仍以 `ArmorDetector loaded OpenVINO ... device=...` 为准。
 
-浏览器访问 `http://127.0.0.1:8080/`。启动后先看 `ArmorDetector loaded OpenVINO ... device=...`，确认实际使用的设备。
-
-修改代码后的编译规则和 Windows 一样：YAML / CMake 改动跑完整 `Build: Webots debug`，纯 C++ 改动可以只跑 `CMake: build Webots debug`，然后停止旧 controller 再启动即可。
-
-### 无头运行
-
-需要重复测试时：
-
-```bash
-XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT \
-LIBGL_ALWAYS_SOFTWARE=1 \
-python3 run_headless_preview.py \
-  --controller build/debug/rm_auto_aim \
-  --runtime-sec 40 --sim-flow-rate 0.1 --run-root .vscode-runs
-```
-
-脚本负责启动和停止 Webots，不要同时再连接一个手工 controller。正常结束后摘要应显示 `status=PASS`、`runtime_errors=0`。
+重复测试或 CI 再使用 `run_headless_preview.py`，日常新人上手先把上面的 GUI + 手工 controller 路线跑通。
 
 ## 接下来
 
-先看[模块索引](/算法组/modules)和[自瞄链路](/算法组/pipeline)。启动失败时看[常见问题](/算法组/troubleshooting)。
+Webots 比实车 Linux 自瞄多模拟了哪些东西，见 [Webots 仿真](/算法组/webots)。算法链路见[自瞄链路](/算法组/pipeline)，启动失败看[常见问题](/算法组/troubleshooting)。
 
 源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)、[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)、[Aimer](https://github.com/QDU-Robomaster/Aimer)。
