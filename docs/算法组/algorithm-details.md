@@ -57,4 +57,4 @@ Tracker 用检测角点、原生标定和安装外参获得观测，再更新车
 
 修改后使用[测试与回归](/算法组/testing)中的固定场景检查。识别精度、位姿误差和命中率需另用对应数据评测。
 
-源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector/tree/7eb9598decd84c9c04352a51a845cf544de2cf0a)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker/tree/ce1d472c4562c91bb875380f0ca1f8d2944381c2)、[Aimer](https://github.com/QDU-Robomaster/Aimer/tree/0ce19e6b6ac0a3b54680b39362f33e6780761515)。
+源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)、[Aimer](https://github.com/QDU-Robomaster/Aimer)。

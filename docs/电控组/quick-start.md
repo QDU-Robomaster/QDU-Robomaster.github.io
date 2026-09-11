@@ -16,7 +16,7 @@ sidebar_position: 2
 XRobot 和代码生成器装在自己的 Python 环境中：
 
 ```bash
-python -m pip install xrobot==0.3.1 libxr
+python -m pip install xrobot libxr
 ```
 
 这里的 Python 包 `libxr` 是代码生成工具。工程使用的 C++ 库通过 Git submodule 获取。
@@ -79,4 +79,4 @@ xrobot_gen_main --config User/RobotConfig/omni_infantry_3.yaml
 
 各份文件的用途见[机器人配置](/电控组/robot-configs)。
 
-源码：[默认配置](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/xrobot.yaml)、[构建脚本](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/tools/build.sh)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)。

@@ -72,4 +72,4 @@ Aimer 预测目标运动、选择装甲面、计算弹道和云台计划，发�
 
 Detector、Tracker 和 Aimer 分别生成预览，共用 VisionPreview 的 HTTP 服务。三路图像均来自实际处理的帧。
 
-源码：[Detector](https://github.com/QDU-Robomaster/ArmorDetector/blob/7eb9598decd84c9c04352a51a845cf544de2cf0a/README.md)、[Tracker](https://github.com/QDU-Robomaster/ArmorTracker/blob/ce1d472c4562c91bb875380f0ca1f8d2944381c2/README.md)、[Aimer](https://github.com/QDU-Robomaster/Aimer/blob/0ce19e6b6ac0a3b54680b39362f33e6780761515/AimerImpl.hpp)。
+源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)、[Aimer](https://github.com/QDU-Robomaster/Aimer)。

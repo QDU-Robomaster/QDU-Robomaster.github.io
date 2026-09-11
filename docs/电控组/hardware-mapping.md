@@ -58,4 +58,4 @@ LibXR::Entry<LibXR::UART>({usb_otg_hs_cdc, {"usb_otg_hs_cdc"}}),
 
 更改外设时，一起检查 `.ioc` 的初始化设置、`app_main.cpp` 中的对象和缓冲区，以及 YAML 引用。模块参数改变则直接修改对应配置。
 
-源码：[User/app_main.cpp](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/app_main.cpp)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)。

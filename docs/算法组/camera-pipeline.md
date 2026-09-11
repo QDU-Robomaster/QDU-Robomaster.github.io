@@ -57,4 +57,4 @@ Detector 和 Tracker 发布的阶段对象指针只在同步回调期间有效�
 
 `cfg.extrinsic.camera_mount_to_body` 只填写 M → B 的实际安装偏差，旋转用 wxyz 四元数，平移单位 m。当前算法 B 系采用右、前、上；这里说明的是 Tracker 使用的定义。
 
-源码：[CameraBase](https://github.com/QDU-Robomaster/CameraBase/tree/9a7392d2e5ebad61722ab6f16adf6d61d5704f73)、[CameraFrameSync](https://github.com/QDU-Robomaster/CameraFrameSync/tree/a713e28d31b61db40285b9ce6e6fe85cc2b177d4)、[Tracker 外参实现](https://github.com/QDU-Robomaster/ArmorTracker/blob/ce1d472c4562c91bb875380f0ca1f8d2944381c2/ArmorTrackerModel.hpp)。
+源码：[CameraBase](https://github.com/QDU-Robomaster/CameraBase)、[CameraFrameSync](https://github.com/QDU-Robomaster/CameraFrameSync)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)。

@@ -74,4 +74,4 @@ referee.tsv      裁判摘要
 
 这些测试用于检查功能和数据连接。识别精度、位姿误差和动态命中率需要单独的数据与统计。
 
-源码：[测试目录](https://github.com/QDU-Robomaster/bsp-webots-autoaim/tree/264c312fff724748784520ff4de0a22afcecd3d4/tests)、[启动器](https://github.com/QDU-Robomaster/bsp-webots-autoaim/blob/264c312fff724748784520ff4de0a22afcecd3d4/run_headless_preview.py)。
+源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)。

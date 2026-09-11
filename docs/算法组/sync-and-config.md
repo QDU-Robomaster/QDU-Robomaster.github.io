@@ -64,4 +64,4 @@ python3 -m xrobot.GenerateMain --config User/RunConfig/vision_capture.yaml --out
 
 `vision_capture.yaml` 同时设置了 `mode: record` 和 `camera_calibration.enabled: true`，会进入内参标定。普通记录时需要关闭该标定开关，详细设置见[数据记录与标定](/算法组/recording-calibration)。
 
-源码：[Webots YAML](https://github.com/QDU-Robomaster/bsp-webots-autoaim/blob/264c312fff724748784520ff4de0a22afcecd3d4/User/xrobot.yaml)、[Linux RunConfig](https://github.com/QDU-Robomaster/bsp-linux-autoaim/tree/abef156bac8805ccccda30d092fa5979a4aef9ef/User/RunConfig)。
+源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)、[bsp-linux-autoaim](https://github.com/QDU-Robomaster/bsp-linux-autoaim)。

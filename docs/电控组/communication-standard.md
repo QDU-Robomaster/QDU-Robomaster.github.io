@@ -52,7 +52,7 @@ C 板接收侧配置：
 
 当前 Aimer 将机械俯仰同时写入 `rol`、`pit`，以及各自的 `_dot`、`_ddot` 字段。实体 HostData/CMD/Gimbal 路径使用 `pit`，WebotsGimbal 使用 `rol`。偏航使用 `yaw` 一组字段。
 
-角度单位为 rad，角速度为 rad/s，角加速度为 rad/s²。这一兼容映射见 [Aimer 的发布代码](https://github.com/QDU-Robomaster/Aimer/blob/0ce19e6b6ac0a3b54680b39362f33e6780761515/AimerImpl.hpp)。
+角度单位为 rad，角速度为 rad/s，角加速度为 rad/s²。字段兼容关系以 [Aimer](https://github.com/QDU-Robomaster/Aimer) 和电控侧消费代码为准。
 
 ## 接口变更
 
@@ -60,4 +60,4 @@ C 板接收侧配置：
 
 遥控事件在机器人 YAML 的 `EventBinder` 中连接。排查模式切换时，依次看输入事件、绑定关系和 CMD 当前控制源。
 
-源码：[C 板收发配置](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/RobotConfig/omni_infantry_3.yaml)、[Linux 收发配置](https://github.com/QDU-Robomaster/bsp-linux-autoaim/blob/abef156bac8805ccccda30d092fa5979a4aef9ef/User/RunConfig/hik.yaml)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)、[bsp-linux-autoaim](https://github.com/QDU-Robomaster/bsp-linux-autoaim)。

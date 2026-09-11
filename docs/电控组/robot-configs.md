@@ -66,4 +66,4 @@ bash tools/build.sh --skip-format -c User/RobotConfig/omni_infantry_3.yaml -b bu
 
 外设名称见[外设映射](/电控组/hardware-mapping)，功能实现见[模块索引](/电控组/modules)。
 
-源码：[RobotConfig](https://github.com/QDU-Robomaster/bsp-dev-c/tree/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/RobotConfig)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)。

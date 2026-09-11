@@ -34,17 +34,13 @@ network:
 
 输出包括颜色、编号和四角点，角点顺序按 `[0,3,2,1]` 转换。`network.logit_threshold` 过滤原始 objectness logit，`min_confidence` 过滤最终置信度。
 
-后续执行 NMS、语义过滤、四边形检查和 PnP。这个 OpenVINO 版本没有独立的数字二次分类器。
+后续执行 NMS、语义过滤、四边形检查和 PnP。当前 OpenVINO 路径没有独立的数字二次分类器。
 
 结果发布与坐标转换见[自瞄链路](/算法组/pipeline)。
 
 ## 检查模型文件
 
-这份模型的 SHA-256：
-
-```text
-d33f2141fcd019690eaed53c171381cda52dc816d8485eedd8a6f503c52aebb8
-```
+需要确认两台机器上的模型是否为同一份文件时，直接计算哈希，不在文档里固定某个哈希值。
 
 Linux：
 
@@ -68,4 +64,4 @@ Get-FileHash .\Modules\ArmorDetector\model\armor_detector_640x512.onnx -Algorith
 
 比较模型时使用相同测试集，记录分辨率、设备、Runtime 版本和处理设置。识别精度与推理耗时分别统计；Webots 的仿真倍率不用于衡量模型速度。
 
-源码：[模型说明](https://github.com/QDU-Robomaster/ArmorDetector/blob/7eb9598decd84c9c04352a51a845cf544de2cf0a/README.md)、[OpenVINO 实现](https://github.com/QDU-Robomaster/ArmorDetector/blob/7eb9598decd84c9c04352a51a845cf544de2cf0a/ArmorDetectorOpenVino.hpp)。
+源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)。

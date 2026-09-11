@@ -56,4 +56,4 @@ GUI 适合观察场景、相机视角和机构运动。无头脚本使用同一�
 
 实体相机延迟、IMU 安装、USB 通信和机械误差仍需实机检查。
 
-源码：[BSP](https://github.com/QDU-Robomaster/bsp-webots-autoaim/tree/264c312fff724748784520ff4de0a22afcecd3d4)、[WebotsGimbal](https://github.com/QDU-Robomaster/WebotsGimbal/tree/8c4b62b3fe25eb40d5c6221ecca0c4f7d0f4823b)、[WebotsFireNotify](https://github.com/QDU-Robomaster/WebotsFireNotify/tree/186ff8a29d14ea329514c94847e56e876424f486)。
+源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)、[WebotsGimbal](https://github.com/QDU-Robomaster/WebotsGimbal)、[WebotsFireNotify](https://github.com/QDU-Robomaster/WebotsFireNotify)。

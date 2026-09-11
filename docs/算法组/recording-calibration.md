@@ -87,4 +87,4 @@ timestamp_us,qw,qx,qy,qz,gx,gy,gz,ax,ay,az
 
 VisionCapture 的图像目录与这种 bin 索引格式不同，回放前需要准备对应格式的文件。默认 YAML 中的历史录像路径也需要替换成自己已有的数据。
 
-源码：[VisionCapture](https://github.com/QDU-Robomaster/VisionCapture/blob/ec0ac456785c9b813d27d9489dc6f706f64ce1ad/README.md)、[CaptureFileCamera](https://github.com/QDU-Robomaster/CaptureFileCamera/blob/7ea66e8847d65c490b189eaf1048504b604baec5/README.md)。
+源码：[VisionCapture](https://github.com/QDU-Robomaster/VisionCapture)、[CaptureFileCamera](https://github.com/QDU-Robomaster/CaptureFileCamera)。

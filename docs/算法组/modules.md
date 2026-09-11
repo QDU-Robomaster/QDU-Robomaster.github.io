@@ -52,4 +52,4 @@ git -C Modules/ArmorDetector status --short
 
 模块实现提交到模块仓库；模型选择、设备参数和实例连接提交到 BSP。
 
-源码：[Webots 模块清单](https://github.com/QDU-Robomaster/bsp-webots-autoaim/blob/264c312fff724748784520ff4de0a22afcecd3d4/Modules/modules.yaml)、[Linux 模块清单](https://github.com/QDU-Robomaster/bsp-linux-autoaim/blob/abef156bac8805ccccda30d092fa5979a4aef9ef/Modules/modules.yaml)。
+源码：[bsp-webots-autoaim](https://github.com/QDU-Robomaster/bsp-webots-autoaim)、[bsp-linux-autoaim](https://github.com/QDU-Robomaster/bsp-linux-autoaim)。

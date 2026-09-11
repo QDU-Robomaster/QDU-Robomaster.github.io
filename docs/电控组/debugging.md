@@ -48,4 +48,4 @@ monitor [time_ms] [interval_ms]
 
 修复后用相同配置和接线复测。检查范围写具体，例如“默认 LED 程序上板通过”或“全向步兵 3 配置编译通过”。
 
-源码：[C 板入口](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/User/app_main.cpp)、[SharedTopic 终端实现](https://github.com/xrobot-org/SharedTopic/blob/489d05938f4b8b24ab950789decb4b43393e8d46/SharedTopic.hpp)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)、[SharedTopic](https://github.com/xrobot-org/SharedTopic)。

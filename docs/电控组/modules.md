@@ -45,4 +45,4 @@ git -C Modules/Gimbal diff
 
 功能改动提交到模块仓库，设备和参数改动提交到 BSP。添加模块、manifest 和生成器的用法见 [XRobot 工程管理](https://xrobot-org.github.io/docs/proj_man)。
 
-源码：[模块清单](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/Modules/modules.yaml)、[来源索引](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/Modules/sources.yaml)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)。

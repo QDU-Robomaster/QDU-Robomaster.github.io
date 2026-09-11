@@ -68,4 +68,4 @@ CubeMX 生成文件只在用户代码区添加应用代码，厂商驱动保持�
 
 提交时把无关格式变化与功能修改分开，具体流程见[团队工作流](/git-collaboration)。
 
-源码：[命名配置](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/.clangd)、[格式脚本](https://github.com/QDU-Robomaster/bsp-dev-c/blob/ddba1b8b9697adfb0fdafbaaa6a3929254c328fb/tools/format_code.sh)。
+源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)。
