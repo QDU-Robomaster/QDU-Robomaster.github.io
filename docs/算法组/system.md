@@ -29,6 +29,7 @@ sidebar_position: 1
 2. [实车自瞄链路](/算法组/pipeline)：`CameraFrameSync -> ArmorDetector -> ArmorTracker -> Aimer` 的数据流。
 3. [算法细节](/算法组/algorithm-details)：Detector、Tracker、Aimer 的主要计算内容。
 4. [Webots 仿真](/算法组/webots)：Webots 相机、云台、裁判和发射机构怎么接入同一条自瞄链路。
+5. [快速上手](/算法组/quick-start)：新人第一次跑通 Webots 仿真的完整顺序，从装环境到看到三路 preview。
 
 ## 4. 电控接口
 

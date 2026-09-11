@@ -9,7 +9,7 @@ sidebar_position: 5
 
 `bsp-webots-autoaim` 的目的不是重新写一套“仿真自瞄”，而是在可重复的虚拟环境中运行真实的 Detector、Tracker 和 Aimer 链路。
 
-第一次配置环境和运行 world，请先完成 [Webots 自瞄快速开始](/dev-environment/bsp-webots-autoaim)。
+第一次跑通环境和 world，请从 [快速上手](/算法组/quick-start) 开始；仓库本身的环境与构建命令见 [`bsp-webots-autoaim` 开发环境](/dev-environment/bsp-webots-autoaim)。
 
 ## 1. 整体链路
 
@@ -167,4 +167,4 @@ Webots 更适合作为“真实算法链路的可控软件在环环境”，而�
 → 再进入具体算法任务
 ```
 
-完整环境配置与运行命令见 [Webots 自瞄快速开始](/dev-environment/bsp-webots-autoaim)。
+完整的新人流程见 [快速上手](/算法组/quick-start)，仓库环境与构建命令见 [`bsp-webots-autoaim` 开发环境](/dev-environment/bsp-webots-autoaim)。
