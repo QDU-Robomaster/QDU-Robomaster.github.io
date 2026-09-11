@@ -20,16 +20,13 @@ Windows 下推荐用原生 Webots 显示场景，用 Docker 提供 Linux 编译�
 - [Webots](https://cyberbotics.com/doc/guide/installation-procedure)
 - [VS Code](https://code.visualstudio.com/)
 
-VS Code 至少安装这些扩展：
+Windows 本机的 VS Code 只要求先安装：
 
 ```text
-Dev Containers
-XRobot                 xrobot.xrobot
-CMake Tools            ms-vscode.cmake-tools
-clangd                 llvm-vs-code-extensions.vscode-clangd
+Dev Containers          ms-vscode-remote.remote-containers
 ```
 
-仓库还推荐 Python、Docker 和调试扩展，可以直接安装 Workspace Recommendations。
+XRobot、CMake Tools、clangd 等开发扩展要安装在后面连接的 Linux 容器里，不要只装在 Windows 本机。
 
 ### 2. 拉取工程
 
@@ -139,7 +136,27 @@ qdu-autoaim-dev
 /workspace
 ```
 
-扩展需要安装在容器侧。确认 XRobot、clangd 和 CMake Tools 在当前 Dev Container 中已经启用。
+第一次连接后先安装容器侧开发扩展。打开 Extensions 面板（`Ctrl+Shift+X`），搜索：
+
+```text
+@recommended
+```
+
+选择 **Install Workspace Recommended Extensions**。仓库已经在 `.vscode/extensions.json` 中声明推荐项，至少确认下面三个显示为 **Installed in Container: qdu-autoaim-dev**：
+
+```text
+XRobot                 xrobot.xrobot
+CMake Tools            ms-vscode.cmake-tools
+clangd                 llvm-vs-code-extensions.vscode-clangd
+```
+
+Python、Docker 和调试扩展也在推荐列表中，可以一并安装。当前工程使用 clangd，因此不建议另外启用 Microsoft C/C++ IntelliSense。
+
+这些扩展安装在 `qdu-autoaim-dev` 容器环境中。以后只要复用同一个容器就会保留；如果执行 `docker rm qdu-autoaim-dev` 后重新创建容器，需要重新安装一次。
+
+:::tip
+这套流程使用 **Attach to Running Container**。不要再对这个工程使用 **Reopen in Container**，否则 `.devcontainer` 配置可能再创建一套 Compose 开发容器，造成两个 `/workspace` 指向不同工程目录。
+:::
 
 ### clangd 第一次会比较慢
 
