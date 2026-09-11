@@ -17,9 +17,41 @@ sidebar_position: 10
 | 输入 | RGB，uint8，`[512, 640, 3]` |
 | 输出 | float32，`[1, 20160, 22]` |
 | 前处理 | 拉伸到 640×512，BGR 转 RGB |
-| 桌面设备设置 | `XR_ARMOR_OPENVINO_DEVICE=CPU` |
+| 推理设备选择 | `XR_ARMOR_OPENVINO_DEVICE` |
 
 该模型不需要额外的 NCHW 转置或归一化。
+
+## 选择 OpenVINO 设备
+
+当前实现从 OpenVINO 的 `available_devices` 中选择设备。可以显式指定：
+
+```bash
+XR_ARMOR_OPENVINO_DEVICE=CPU
+XR_ARMOR_OPENVINO_DEVICE=GPU
+XR_ARMOR_OPENVINO_DEVICE=NPU
+```
+
+也可以使用自动选择：
+
+```bash
+XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT
+```
+
+不设置该变量时同样进入自动选择。当前优先级为：
+
+```text
+NPU → GPU → CPU
+```
+
+自动模式只在 OpenVINO 实际枚举出的设备中选择。显式指定某个设备时，编译模型失败会直接报错，不会再尝试其他设备。因此部署时应检查启动日志中的：
+
+```text
+ArmorDetector loaded OpenVINO ... device=<DEVICE> input=640x512
+```
+
+设备名也可以是 OpenVINO 提供的具体实例名，例如 `GPU.0`。
+
+裸模型能够在某个设备上 `compile_model()` 并不等于整条自瞄链路已经验证。更换设备后仍应至少跑一次 Webots 流水线，确认 Detector、Tracker、Aimer 和预览都正常工作。
 
 在 Detector 配置中选择：
 

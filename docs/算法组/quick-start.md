@@ -123,7 +123,30 @@ XR_ARMOR_OPENVINO_DEVICE=CPU \
 ./build/debug/rm_auto_aim
 ```
 
-`host.docker.internal` 是容器访问 Windows 宿主机的地址。这里先用较低的仿真速度，运行稳定后再调整 `WEBOTS_SIM_FLOW_RATE`。
+`host.docker.internal` 是容器访问 Windows 宿主机的地址。当前 Windows Docker 开发环境通常只把 CPU 暴露给 OpenVINO，因此这里显式选择 `CPU`。这里先用较低的仿真速度，运行稳定后再调整 `WEBOTS_SIM_FLOW_RATE`。
+
+OpenVINO 设备通过 `XR_ARMOR_OPENVINO_DEVICE` 选择：
+
+```text
+CPU          强制 CPU
+GPU          强制 GPU
+NPU          强制 NPU
+AUTO_DETECT  自动选择
+```
+
+不设置这个变量与 `AUTO_DETECT` 等价。当前自动优先级为：
+
+```text
+NPU → GPU → CPU
+```
+
+显式指定某个设备时，如果该设备不可用，初始化会直接报错，不会静默切换到其他设备。启动日志会打印实际加载设备，例如：
+
+```text
+ArmorDetector loaded OpenVINO ... device=CPU input=640x512
+```
+
+因此不要仅根据机器“应该有 GPU/NPU”判断实际推理设备，以这行日志为准。
 
 三路预览在容器的 8080 端口。VS Code 底部打开 **Ports** 面板，选择 **Forward a Port**，输入：
 
@@ -267,11 +290,13 @@ webots --port=1235 --stdout --stderr --mode=fast --extern-urls \
 ```bash
 WEBOTS_CONTROLLER_URL=tcp://127.0.0.1:1235/self \
 WEBOTS_SIM_FLOW_RATE=0.1 \
-XR_ARMOR_OPENVINO_DEVICE=CPU \
+XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT \
 ./build/debug/rm_auto_aim
 ```
 
-浏览器访问 `http://127.0.0.1:8080/`。
+Linux 主机如果同时具备 NPU、GPU 和 CPU，自动模式会依次尝试选择 `NPU → GPU → CPU` 中第一个可用设备。需要做对照测试或固定部署设备时，直接改成 `CPU`、`GPU` 或 `NPU`。
+
+浏览器访问 `http://127.0.0.1:8080/`。启动后先看 `ArmorDetector loaded OpenVINO ... device=...`，确认实际使用的设备。
 
 修改代码后的编译规则和 Windows 一样：YAML / CMake 改动跑完整 `Build: Webots debug`，纯 C++ 改动可以只跑 `CMake: build Webots debug`，然后停止旧 controller 再启动即可。
 
@@ -280,7 +305,7 @@ XR_ARMOR_OPENVINO_DEVICE=CPU \
 需要重复测试时：
 
 ```bash
-XR_ARMOR_OPENVINO_DEVICE=CPU \
+XR_ARMOR_OPENVINO_DEVICE=AUTO_DETECT \
 LIBGL_ALWAYS_SOFTWARE=1 \
 python3 run_headless_preview.py \
   --controller build/debug/rm_auto_aim \
