@@ -1,49 +1,75 @@
 ---
 id: algorithm-pipeline
-title: 实车自瞄链路
+title: 自瞄链路
 slug: /算法组/pipeline
-sidebar_position: 3
+sidebar_position: 6
 ---
 
-# 实车自瞄链路
-
-`User/RunConfig/hik.yaml` 是实车运行入口，主链路是：
+# 自瞄链路
 
 ```text
-HikCamera
-  -> CameraFrameSync
-  -> ArmorDetector
-  -> ArmorTracker
-  -> Aimer
-  -> SharedTopicClient
+HikCamera / CaptureFileCamera / WebotsCamera
+                    ↓
+             CameraFrameSync
+                    ↓
+              ArmorDetector
+                    ↓ armor_detector/armors_frame
+              ArmorTracker
+                    ↓ tracker/target_frame
+                  Aimer
+             ↙             ↘
+ host/target_euler      host/fire_notify
 ```
 
-`User/RunConfig/capturefile.yaml` 用来回放视觉链路。它保留 Detector、Tracker、Aimer 的处理流程，但输入来自记录文件，不依赖 Hik 相机和 C 板。
+实体 Linux BSP 通过 SharedTopicClient 把控制结果送到 C 板；Webots 则把同样的输出交给 WebotsGimbal 和 WebotsFireNotify。
 
-## 1. 模块职责
+## 同步帧与检测
 
-| 模块 | 负责内容 |
-| --- | --- |
-| `HikCamera` | 读取 Hik 相机图像，实车配置使用硬件触发。 |
-| `CameraFrameSync` | 对齐图像和 IMU，向后级提供同步帧。 |
-| `ArmorDetector` | 从同步帧读取图像和 IMU，检测装甲板四角点，过滤候选后做 PnP。 |
-| `ArmorTracker` | 读取 Detector 结果和同帧 IMU，结合手眼外参维护目标状态，发布 `tracker/target_frame`。 |
-| `Aimer` | 读取 `tracker/target_frame`，生成云台目标和发射许可。 |
-| `SharedTopicClient` | 把 `target_euler`、`fire_notify`、`camera_sync_command` 转发到 C 板。 |
+CameraFrameSync 输出图像、IMU 和同帧几何。Detector 把图像转换为模型输入，然后完成检测、过滤和 PnP。
 
-## 2. Detector 到 Tracker
+Webots 原图为 800×600，OpenVINO 网络输入为 640×512。网络前处理负责尺寸转换，相机标定仍使用原生尺寸。
 
-`ArmorDetector` 发布 `armor_detector/armors_frame`。这个结果包含当前帧装甲板检测结果、图像时间戳和同步帧引用。
+## 检测与跟踪
 
-`ArmorTracker` 消费 Detector 输出后，只向后级发布一个当前选择目标：`tracker/target_frame`。多目标状态可以同时维护，但对 Aimer 的接口保持单一目标。
+`armor_detector/armors_frame` 的负载是 `const DetectedFrame<Layout>*`，包含共享图像、IMU、类别、角点和 PnP 结果。
 
-## 3. Tracker 到 Aimer
+发布的角点、中心与包围盒使用原生传感器像素坐标。显示时再映射回当前帧。
 
-`Aimer` 只使用 `tracker/target_frame` 做目标选择、预测和弹道计算。原始图像和 IMU 只用于内置预览投影，不参与额外决策。
+Tracker 使用这些角点和原生 K/D 重新做 PnP，当前模型采用 230 mm 大装甲板尺寸，并不直接沿用 Detector 的 pose。
 
-输出给电控侧的 topic：
+## 跟踪与瞄准
 
-1. `host/target_euler`：云台目标角、角速度和角加速度前馈。
-2. `host/fire_notify`：发射许可。
+Tracker 按编号维护多个车辆状态，按评分和切换滞回选出一个目标，发布 `tracker/target_frame`。
 
-机械俯仰轴使用 `target_euler.rol` 字段，具体字段含义看 [坐标系规范](/coordinate-system-standard)。
+负载 `const TrackedFrame*` 包含选中目标、共享图像、IMU 和预览投影变换。异步处理需复制阶段对象并保留 SharedFrame，见[相机与同步](/算法组/camera-pipeline)。
+
+目标位置使用惯性解算轴 O，x 向右、y 向前、z 向上，轴向不随当前云台 yaw 旋转。方位角计算为：
+
+```text
+yaw = atan2(-x, y)
+```
+
+正前方为零，左侧为正。
+
+## 执行输出
+
+Aimer 预测目标运动、选择装甲面、计算弹道和云台计划，发布目标包与发射许可。
+
+| 字段 | 内容 | 单位 |
+| --- | --- | --- |
+| `rol`、`pit` | 同一机械俯仰目标 | rad |
+| `yaw` | 偏航目标 | rad |
+| `rol_dot`、`pit_dot`、`yaw_dot` | 对应角速度 | rad/s |
+| `rol_ddot`、`pit_ddot`、`yaw_ddot` | 对应角加速度 | rad/s² |
+
+Aimer 同时填充 `rol` 和 `pit` 两组俯仰字段：WebotsGimbal 读取 `rol`，实体 HostData/CMD/Gimbal 路径使用 `pit`。
+
+## 裁判与预览
+
+裁判摘要来自 `host/robot_game_ref`，类型为 `RefereeTypes::RobotGameRefereePack`。Aimer 使用配置的默认弹速，并读取热量上限和冷却值；没有热量数据时日志显示 `heat=unknown`。
+
+`host/gimbal_quat` 用于自动开火对齐检查，缺失时不自动开火。
+
+Detector、Tracker 和 Aimer 分别生成预览，共用 VisionPreview 的 HTTP 服务。三路图像均来自实际处理的帧。
+
+源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)、[Aimer](https://github.com/QDU-Robomaster/Aimer)。

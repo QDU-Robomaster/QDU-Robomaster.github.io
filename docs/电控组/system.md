@@ -7,26 +7,34 @@ sidebar_position: 1
 
 # 电控组文档总览
 
-这里放电控组自己的工程说明：先找到仓库、配置文件和常用流程。工具安装、编译、烧录放在开发环境页；跨组共用的内容放在全组文档。
+电控工程使用 XRobot / LibXR。板级初始化放在 BSP，底盘、云台等功能放在独立模块里，各车的设备和参数写在 YAML 中。
 
-## 1. 先读
+第一次使用从[快速上手](/电控组/quick-start)开始。框架安装、代码生成和模块创建见 [XRobot 文档](https://xrobot-org.github.io/)。
 
-1. [设计思想](/design-philosophy)
-2. [坐标系规范](/coordinate-system-standard)
-3. [`bsp-dev-c` 开发环境](/dev-environment/bsp-dev-c)
-4. [Git 协作指南](/git-collaboration)
+## 常用工程
 
-## 2. 常用位置
+| 仓库 | 用途 | 环境配置 |
+| --- | --- | --- |
+| `bsp-dev-c` | C 板电控，包含多种机器人配置 | [bsp-dev-c](/dev-environment/bsp-dev-c) |
+| `bsp-dev-mc02` | MC02 板级工程 | [bsp-dev-mc02](/dev-environment/bsp-dev-mc02) |
 
-1. `bsp-dev-c`：当前主要 C 板电控工程。
-2. `bsp-dev-mc02`：MC02 相关工程。
-3. `Modules/modules.yaml`：工程使用的模块清单。
-4. `Modules/sources.yaml`：模块来源配置。
-5. `User/RobotConfig/*.yaml`：不同机器人的模块实例、参数和连接关系。
-6. `User/xrobot_main.hpp`：由 `xrobot_gen_main` 生成的入口文件。
+C 板默认程序只有 LED 闪烁，整车配置在 `User/RobotConfig/`。MC02 的默认程序为蜂鸣器测试。
 
-## 3. 目录内容
+## 工程里几个常用位置
 
-1. [快速上手](/电控组/quick-start)：第一次拉取仓库、初始化模块、生成机器人入口。
-2. [代码规范](/电控组/code-standard)：电控 C++ 模块、配置和调试入口的写法。
-3. [通信规范](/电控组/communication-standard)：Topic、Event、SharedTopic、CAN / UART 怎么分工。
+| 位置 | 内容 |
+| --- | --- |
+| `User/app_main.cpp` | 创建外设对象、注册 HardwareContainer、启动应用 |
+| `User/RobotConfig/*.yaml` | 机器人模块、设备参数和事件绑定 |
+| `User/xrobot.yaml` | 默认运行配置 |
+| `User/xrobot_main.hpp` | 按 YAML 生成的模块入口 |
+| `Modules/modules.yaml` | 模块依赖清单 |
+| `Modules/sources.yaml` | 模块来源索引 |
+| `Modules/<Name>/` | 独立模块仓库 |
+| `Middlewares/Third_Party/LibXR/` | LibXR submodule |
+
+## 文档目录
+
+[机器人配置](/电控组/robot-configs)列出各份 YAML 的内容；[模块索引](/电控组/modules)用于查找功能实现；[外设映射](/电控组/hardware-mapping)对应 C 板的 CAN、串口、USB 和 GPIO。
+
+日常修改用到的规则和排查方法分别放在[代码规范](/电控组/code-standard)、[通信规范](/电控组/communication-standard)和[调试与上板](/电控组/debugging)。提交代码按站内[团队工作流](/git-collaboration)执行。

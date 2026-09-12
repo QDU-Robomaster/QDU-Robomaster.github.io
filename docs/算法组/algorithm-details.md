@@ -2,56 +2,59 @@
 id: algorithm-details
 title: 算法细节
 slug: /算法组/algorithm-details
-sidebar_position: 4
+sidebar_position: 7
 ---
 
 # 算法细节
 
-这里记录自瞄主链路里会影响结果的核心计算。模型训练、数据集整理和离线评测另行记录。
+## ArmorDetector
 
-## 1. ArmorDetector
+Detector 从同步帧取图像，经过模型前处理、推理、候选解码、NMS、语义过滤、四边形检查和 PnP，发布装甲板结果。
 
-`ArmorDetector` 的输出不是普通框，而是带四角点和 PnP 位姿的装甲板结果。
+主要文件：
 
-处理流程：
+| 文件 | 内容 |
+| --- | --- |
+| `ArmorDetectorNetwork.hpp` | 模型选择与初始化 |
+| `ArmorDetectorRuntime.hpp` | 处理阶段、输入槽和结果发布 |
+| `infer/ArmorDetectorModelRegistry.hpp` | 模型枚举与工件、后端的对应 |
+| `ArmorDetectorPnPSolver.hpp` | PnP 求解 |
 
-1. 从 `CameraFrameSync` 读取同步帧。
-2. 将图像送入 OpenVINO 模型。
-3. 解码颜色、编号、置信度和四角点。
-4. 过滤低置信度、颜色不匹配、编号无效或几何异常的候选。
-5. 对有效候选做 PnP，发布 `armor_detector/armors_frame`。
+OpenVINO 推理 worker 按输入槽管理请求和输出，丢帧、推理失败、后处理失败分别计数，便于定位吞吐瓶颈。
 
-当前配置启用数字 refine：检测候选成立后，再用数字分类结果修正编号；置信度不足或尺寸类型冲突时不会覆盖 detector 编号。
+模型格式和门限说明见[模型与数据](/算法组/models-data)。
 
-## 2. ArmorTracker
+## ArmorTracker
 
-`ArmorTracker` 读取 Detector 结果和同帧 IMU，使用 `camera_mount_to_body` 手眼外参把相机观测转换到公开本体系。
+Tracker 用检测角点、原生标定和安装外参获得观测，再更新车辆状态与 EKF。
 
-Tracker 内部按装甲板编号维护目标状态。同一帧出现多个编号时，各编号独立更新，最后只输出当前选中的目标。
+`ArmorTrackerPipeline.hpp` 负责订阅、发布和预览，`ArmorTrackerCore.hpp` 连接输入与核心处理，`ArmorTrackerModel.hpp` 实现观测、状态模型和滤波。
 
-目标选择会参考：
+不同装甲板编号分别维护目标状态。目标选择考虑观测数量、距离、图像面积、自旋速度和视轴角差；`switch_margin` 控制换目标所需的分差。
 
-1. 近期观测数量。
-2. 距离。
-3. 图像面积。
-4. 自旋速度。
-5. 相对当前视轴的角差。
-6. 切换裕量。
+常用参数在 `cfg.tracker`：
 
-输出 `tracker/target_frame` 使用公开坐标约定：右手系，`x` 向右，`y` 向前，`z` 向上。
+| 参数 | 用途 |
+| --- | --- |
+| `require_target_tag`、`target_tag_id` | 是否只跟踪指定编号 |
+| `min_detect_count` | 进入跟踪所需的观测次数 |
+| `max_temp_lost_count` | 暂时丢失后的保留次数 |
+| `target_select` | 各评分项的权重、归一化参数和切换裕量 |
 
-## 3. Aimer
+循环回放时，时间戳回到起点会触发 Tracker 清理旧状态并重新建立时间基线。
 
-`Aimer` 在 Tracker 输出之后工作。它会按延迟预测目标位置，展开可打装甲板，解算弹道，再生成 yaw / roll 云台目标。
+## Aimer
 
-当前 Aimer 关注这些输入：
+`AimerTargetModel.hpp` 负责目标预测和装甲面展开，`AimerMath.hpp` 处理角度与弹道，`AimerPlanner.hpp` 生成云台计划，`AimerImpl.hpp` 连接回调与输出。
 
-1. `tracker/target_frame`：目标状态。
-2. `host/robot_game_ref`：弹速、热量上限和冷却值等裁判信息。
-3. `host/gimbal_quat`：云台姿态反馈，用于自动开火判断。
+弹道模型包含二次空气阻力，使用 RK4 积分和一维求根寻找低弹道仰角。无法求解时输出空命令。
 
-弹道解算使用带空气阻力的弹丸运动模型。云台目标规划使用 yaw / roll 双轴 TinyMPC。自动开火还会检查命中候选、命令稳定性和云台反馈。
+启用 MPC 后，yaw 和机械俯仰分别使用双积分模型。预测窗口为 100 个样本、步长 0.01 s，参考轨迹会随预测过程重新选择装甲面。
 
-## 4. 坐标边界
+开火需要同时满足装甲面可打、计划与命中候选一致、命令稳定和云台对齐。姿态反馈来自 `host/gimbal_quat`。
 
-坐标、目标角和 `host/target_euler` 字段含义以 [坐标系规范](/coordinate-system-standard) 为准。算法组页不重新定义坐标。
+延迟、阻力、加速度限制和 MPC 权重在 Aimer 的 `cfg` 中配置。预览由 `AimerPreview.hpp` 投影同帧目标，不参与弹道和 MPC 计算。
+
+算法改动可以先用[测试与回归](/算法组/testing)中的固定场景做功能检查；识别精度、位姿误差和命中率再用对应数据集评测。
+
+源码：[ArmorDetector](https://github.com/QDU-Robomaster/ArmorDetector)、[ArmorTracker](https://github.com/QDU-Robomaster/ArmorTracker)、[Aimer](https://github.com/QDU-Robomaster/Aimer)。

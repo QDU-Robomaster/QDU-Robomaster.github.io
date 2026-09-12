@@ -1,42 +1,37 @@
 ---
 id: algorithm-overview
-title: 算法组文档总览
+title: 算法组开发指南
 slug: /算法组
 sidebar_position: 1
 ---
 
-# 算法组文档总览
+# 算法组开发指南
 
-这里放算法组常用工程、运行配置和链路说明。环境安装和构建命令放在开发环境页。
+自瞄工程从相机和 IMU 开始，经过同步、装甲板检测和目标跟踪，最后由 Aimer 生成云台目标与开火请求。Webots 和实体机器人共用 Detector、Tracker、Aimer，只在输入、通信和执行端使用不同的 BSP 模块。
 
-## 1. 先读
+刚接触工程时先走一遍[快速上手](/算法组/quick-start)。Webots 可以把整条链路跑起来，不依赖实体机器人。
 
-1. [设计思想](/design-philosophy)
-2. [坐标系规范](/coordinate-system-standard)
-3. [开发环境](/dev-environment)
-4. [Git 协作指南](/git-collaboration)
+## 常用仓库
 
-## 2. 常用仓库
+| 仓库 | 用途 | 环境配置 |
+| --- | --- | --- |
+| `bsp-webots-autoaim` | 仿真场景与自瞄 controller | [bsp-webots-autoaim](/dev-environment/bsp-webots-autoaim) |
+| `bsp-linux-autoaim` | 实体相机、文件回放和采集标定 | [bsp-linux-autoaim](/dev-environment/bsp-linux-autoaim) |
 
-1. `bsp-linux-autoaim`：实车 Linux 自瞄工程。
-2. `bsp-webots-autoaim`：Webots 自瞄仿真工程。
-3. `Modules/modules.yaml`：视觉、通信、预览等模块清单。
-4. `Modules/sources.yaml`：模块来源配置。
+`Modules/modules.yaml` 列出依赖，`User/xrobot.yaml` 或 `User/RunConfig/` 下的 YAML 决定实际运行配置。XRobot 的模块管理和代码生成用法见[上游文档](https://xrobot-org.github.io/docs/proj_man)。
 
-## 3. 目录内容
+## 从哪里开始
 
-1. [相机同步与运行配置](/算法组/sync-and-config)：实车、回放、采集标定三类入口，以及手眼外参写在哪里。
-2. [实车自瞄链路](/算法组/pipeline)：`CameraFrameSync -> ArmorDetector -> ArmorTracker -> Aimer` 的数据流。
-3. [算法细节](/算法组/algorithm-details)：Detector、Tracker、Aimer 的主要计算内容。
-4. [Webots 仿真](/算法组/webots)：Webots 相机、云台、裁判和发射机构怎么接入同一条自瞄链路。
-
-## 4. 电控接口
-
-1. 坐标系、单位、姿态字段和目标位姿含义看 [坐标系规范](/coordinate-system-standard)。
-2. Topic 名、字段语义和时间戳含义改动前，确认电控侧同步更新。
-3. 相机、串口、模型路径、回放文件和外参放在运行配置里。
-
-## 5. 开发入口
-
-1. [`bsp-linux-autoaim` 开发环境](/dev-environment/bsp-linux-autoaim)
-2. [`bsp-webots-autoaim` 开发环境](/dev-environment/bsp-webots-autoaim)
+| 内容 | 页面 |
+| --- | --- |
+| 启动工程、连接 Webots、查看画面 | [快速上手](/算法组/quick-start) |
+| 功能与源码文件对应 | [模块索引](/算法组/modules) |
+| 相机、触发、时间戳和图像几何 | [相机与同步](/算法组/camera-pipeline) |
+| 不同输入和运行 YAML | [运行配置](/算法组/sync-and-config) |
+| Detector、Tracker、Aimer 之间的数据 | [自瞄链路](/算法组/pipeline) |
+| 检测、跟踪、弹道和计划实现 | [算法细节](/算法组/algorithm-details) |
+| world、controller 和仿真设备 | [Webots 仿真](/算法组/webots) |
+| 记录文件、内参标定和手眼采样 | [数据记录与标定](/算法组/recording-calibration) |
+| OpenVINO 模型格式与文件检查 | [模型与数据](/算法组/models-data) |
+| 配置、启动器和场景测试 | [测试与回归](/算法组/testing) |
+| 构建、连接、模型和画面故障 | [常见问题](/算法组/troubleshooting) |
