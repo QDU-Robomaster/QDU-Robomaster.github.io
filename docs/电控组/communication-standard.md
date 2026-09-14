@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # 通信规范
 
-模块间使用 Topic 传递数据，模式切换等动作通过 Event 连接。框架接口见 [消息系统](https://xrobot-org.github.io/docs/basic_coding/middleware/message)和[事件系统](https://xrobot-org.github.io/docs/basic_coding/middleware/event)。
+模块间使用 Topic 传递数据，模式切换等动作通过 Event 连接。框架接口见 [消息系统](https://xrobot.work/docs/basic_coding/middleware/message)和[事件系统](https://xrobot.work/docs/basic_coding/middleware/event)。
 
 ## 主机与 C 板
 

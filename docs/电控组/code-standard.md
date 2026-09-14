@@ -7,7 +7,7 @@ sidebar_position: 7
 
 # 代码规范
 
-C 板工程采用 C++20。命名规则在 `.clangd`，格式在 `.clang-format`；模块创建和 manifest 写法见 [XRobot 工程管理](https://xrobot-org.github.io/docs/proj_man)。
+C 板工程采用 C++20。命名规则在 `.clangd`，格式在 `.clang-format`；模块创建和 manifest 写法见 [XRobot 工程管理](https://xrobot.work/docs/proj_man)。
 
 ## 命名
 

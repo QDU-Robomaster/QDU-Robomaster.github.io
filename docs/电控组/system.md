@@ -9,7 +9,7 @@ sidebar_position: 1
 
 电控工程使用 XRobot / LibXR。板级初始化放在 BSP，底盘、云台等功能放在独立模块里，各车的设备和参数写在 YAML 中。
 
-第一次使用从[快速上手](/电控组/quick-start)开始。框架安装、代码生成和模块创建见 [XRobot 文档](https://xrobot-org.github.io/)。
+第一次使用从[快速上手](/电控组/quick-start)开始。框架安装、代码生成和模块创建见 [XRobot 文档](https://xrobot.work/)。
 
 ## 常用工程
 

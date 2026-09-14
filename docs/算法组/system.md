@@ -18,7 +18,7 @@ sidebar_position: 1
 | `bsp-webots-autoaim` | 仿真场景与自瞄 controller | [bsp-webots-autoaim](/dev-environment/bsp-webots-autoaim) |
 | `bsp-linux-autoaim` | 实体相机、文件回放和采集标定 | [bsp-linux-autoaim](/dev-environment/bsp-linux-autoaim) |
 
-`Modules/modules.yaml` 列出依赖，`User/xrobot.yaml` 或 `User/RunConfig/` 下的 YAML 决定实际运行配置。XRobot 的模块管理和代码生成用法见[上游文档](https://xrobot-org.github.io/docs/proj_man)。
+`Modules/modules.yaml` 列出依赖，`User/xrobot.yaml` 或 `User/RunConfig/` 下的 YAML 决定实际运行配置。XRobot 的模块管理和代码生成用法见[上游文档](https://xrobot.work/docs/proj_man)。
 
 ## 从哪里开始
 

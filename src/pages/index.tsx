@@ -93,7 +93,7 @@ export default function Home(): JSX.Element {
               
               <Link
                 className="button button--secondary button--lg"
-                to="https://xrobot-org.github.io/libxr_web_demo/"
+                to="https://xrobot.work/libxr_web_demo/"
               >
                 <Translate id="homepage.onlineDemo">在线演示</Translate>
               </Link>
@@ -173,11 +173,11 @@ export default function Home(): JSX.Element {
             <li>
               本文档仅包含使用和编码教程。 库函数 API 和命令行工具文档请参考{' '}
               <a
-                href="https://xrobot-org.github.io/"
+                href="https://xrobot.work/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                https://xrobot-org.github.io/
+                https://xrobot.work/
               </a>
               。
             </li>

@@ -11,7 +11,7 @@ sidebar_position: 2
 
 ## 准备工具
 
-按 [STM32 环境配置](https://xrobot-org.github.io/docs/env_setup/env-setup-stm32)安装工具链和调试工具。Windows 可以直接使用原生 STM32 开发环境。
+按 [STM32 环境配置](https://xrobot.work/docs/env_setup/env-setup-stm32)安装工具链和调试工具。Windows 可以直接使用原生 STM32 开发环境。
 
 XRobot 和代码生成器装在自己的 Python 环境中：
 

@@ -31,5 +31,5 @@ xrobot_gen_main --config User/RobotConfig/omni_infantry.yaml
 
 官方文档：
 
-1. [STM32 环境配置](https://xrobot-org.github.io/docs/env_setup/env-setup-stm32)
-2. [STM32 代码生成](https://xrobot-org.github.io/docs/code_gen/stm32)
+1. [STM32 环境配置](https://xrobot.work/docs/env_setup/env-setup-stm32)
+2. [STM32 代码生成](https://xrobot.work/docs/code_gen/stm32)
