@@ -79,12 +79,12 @@ docker exec -it qdu-autoaim-dev bash
 进入工程后执行：
 
 ```bash
-xrobot_setup
+xrobot setup
 ```
 
-完成后应能看到 `Modules/ArmorDetector/`、`Modules/ArmorTracker/`、`Modules/Aimer/` 等目录。`xrobot_setup` 会同时生成当前入口文件；后续 CMake 也会在 YAML 变化时自动重新生成。
+完成后应能看到 `Modules/QDU-Robomaster/ArmorDetector/`、`Modules/QDU-Robomaster/ArmorTracker/`、`Modules/QDU-Robomaster/Aimer/` 等目录，模块按 `xrobot.lock` 中的提交检出。`xrobot setup` 会同时生成入口文件 `User/xrobot_main.hpp`。
 
-`User/xrobot_main.hpp` 和 `User/xrobot_constexpr.hpp` 由 XRobot 生成，修改配置时改 YAML 即可。
+`User/xrobot_main.hpp` 由 XRobot 生成，`User/xrobot.yaml` 中 `constexprs` 段的常量生成到其中的 `AutoAimRunConfig` 命名空间。修改配置时改 YAML，再运行 `xrobot gen`。
 
 ### 配置与编译
 
@@ -173,7 +173,7 @@ Windows bind mount 下，首次 background index 往往需要一段时间。状�
 索引完成后可以检查：
 
 - `User/main.cpp` 中的 `XRobotMain` 能否 `F12` 跳转；
-- `Modules/ArmorDetector/ArmorDetector.hpp` 中的类型能否正常跳转；
+- `Modules/QDU-Robomaster/ArmorDetector/ArmorDetector.hpp` 中的类型能否正常跳转；
 - include 是否不再整页报红。
 
 `build/debug/compile_commands.json` 已存在而索引仍长期停滞时，可以重启 language server：
@@ -187,7 +187,7 @@ Ctrl+Shift+P
 
 ### 在 VS Code 中编译
 
-首次完成 `xrobot_setup` 后，仓库的 CMake Tools 配置会在打开工程时自动 configure：
+首次完成 `xrobot setup` 后，仓库的 CMake Tools 配置会在打开工程时自动 configure：
 
 ```text
 source      /workspace
@@ -198,16 +198,9 @@ build type  Debug
 
 VS Code 底部状态栏或 CMake Tools 面板里的 **Build** 可以直接构建 `build/debug`，底层使用 Ninja 并行编译。
 
-CMake 还会跟踪：
+CMake 构建前检查 `User/xrobot_main.hpp` 是否与生成它的输入一致。修改 `User/xrobot.yaml` 后入口过期，构建停止并提示运行 `xrobot gen -c <配置>`；运行 `xrobot gen` 后再 Build。
 
-```text
-User/xrobot.yaml
-Modules/modules.yaml
-```
-
-这两个配置变化后，CMake 会先更新 XRobot 生成文件，再编译 `rm_auto_aim`。
-
-仓库 task 也提供同一套完整流程：
+仓库 task 提供包含生成步骤的完整流程：
 
 ```text
 Ctrl+Shift+B
@@ -217,7 +210,7 @@ Ctrl+Shift+B
 它会显式执行：
 
 ```text
-生成 XRobot 入口
+xrobot setup（检出模块并生成 XRobot 入口）
 → configure build/debug
 → 并行编译 rm_auto_aim
 ```
@@ -326,11 +319,11 @@ VS Code 通常会在 **Ports** 面板自动发现 8080。没有出现时再手�
 常用代码位置：
 
 ```text
-User/xrobot.yaml        模块实例和参数
-Modules/ArmorDetector/  检测
-Modules/ArmorTracker/   跟踪
-Modules/Aimer/          瞄准与弹道
-webots/                 world、PROTO 和仿真资源
+User/xrobot.yaml                       模块实例和参数
+Modules/QDU-Robomaster/ArmorDetector/  检测
+Modules/QDU-Robomaster/ArmorTracker/   跟踪
+Modules/QDU-Robomaster/Aimer/          瞄准与弹道
+webots/                                world、PROTO 和仿真资源
 ```
 
 ### C++ 修改
@@ -353,15 +346,16 @@ Ctrl+Shift+P
 
 ### YAML 与模块配置
 
-直接 build 即可：
+先重新生成入口，再 build：
 
 ```bash
+xrobot gen
 cmake --build build/debug \
   --target rm_auto_aim \
   --parallel "$(nproc)"
 ```
 
-`User/xrobot.yaml` 更新后，CMake 会先重新生成 `User/xrobot_main.hpp` 和 `User/xrobot_constexpr.hpp`，再继续编译。CMake Tools **Build** 和 `Ctrl+Shift+B → Build: Webots debug` 走的是同一套依赖。
+`xrobot gen` 由 `User/xrobot.yaml` 重新生成 `User/xrobot_main.hpp`。修改 `Modules/modules.yaml` 后改为运行 `xrobot setup`。`Ctrl+Shift+B → Build: Webots debug` 先执行 `xrobot setup`，因此同样会更新入口。
 
 如果同时改了 CMakeLists、增加了源文件，CMake Tools 会重新 configure；命令行使用时重新执行一次前面的 `cmake -S ... -B ...` 即可。
 
@@ -391,7 +385,8 @@ Linux 可以直接在本机编译和运行。准备好 Git、CMake、Ninja、C++
 git clone https://github.com/QDU-Robomaster/bsp-webots-autoaim.git
 cd bsp-webots-autoaim
 git submodule update --init --recursive
-xrobot_setup
+pip install xrobot==1.0.0
+xrobot setup
 
 cmake -S . -B build/debug -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug \

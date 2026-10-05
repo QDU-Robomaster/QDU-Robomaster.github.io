@@ -24,13 +24,14 @@ C 板默认程序只有 LED 闪烁，整车配置在 `User/RobotConfig/`。MC02 
 
 | 位置 | 内容 |
 | --- | --- |
-| `User/app_main.cpp` | 创建外设对象、注册 HardwareContainer、启动应用 |
+| `User/app_main.cpp` | 创建外设对象、用 `XR_REGISTER` 注册硬件、调用 `XROBOT_MAIN()` |
 | `User/RobotConfig/*.yaml` | 机器人模块、设备参数和事件绑定 |
 | `User/xrobot.yaml` | 默认运行配置 |
 | `User/xrobot_main.hpp` | 按 YAML 生成的模块入口 |
 | `Modules/modules.yaml` | 模块依赖清单 |
 | `Modules/sources.yaml` | 模块来源索引 |
-| `Modules/<Name>/` | 独立模块仓库 |
+| `xrobot.lock` | 每个模块使用的提交 |
+| `Modules/<owner>/<Repo>/` | 独立模块仓库 |
 | `Middlewares/Third_Party/LibXR/` | LibXR submodule |
 
 ## 文档目录

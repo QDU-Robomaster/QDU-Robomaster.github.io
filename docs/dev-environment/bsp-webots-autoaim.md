@@ -27,12 +27,12 @@ git submodule update --init --recursive
 XRobot 模块在开发容器中初始化：
 
 ```bash
-xrobot_setup
+xrobot setup
 ```
 
-完成后应能看到 `Modules/ArmorDetector/`、`Modules/ArmorTracker/`、`Modules/Aimer/` 等目录。
+`xrobot setup` 按 `xrobot.lock` 中的提交检出模块，完成后应能看到 `Modules/QDU-Robomaster/ArmorDetector/`、`Modules/QDU-Robomaster/ArmorTracker/`、`Modules/QDU-Robomaster/Aimer/` 等目录。
 
-`User/xrobot_main.hpp` 和 `User/xrobot_constexpr.hpp` 都是生成文件。修改 `User/xrobot.yaml` 或 `Modules/modules.yaml` 后，正常 CMake build 会自动重新生成入口。
+`User/xrobot_main.hpp` 是生成文件，`User/xrobot.yaml` 中 `constexprs` 段的常量生成到其中的 `AutoAimRunConfig` 命名空间。修改 `User/xrobot.yaml` 后运行 `xrobot gen`，修改 `Modules/modules.yaml` 后运行 `xrobot setup`。生成入口过期时，CMake 构建停止并提示运行 `xrobot gen -c <配置>`。
 
 ## Windows 开发环境
 
@@ -138,7 +138,8 @@ Linux 不使用 Docker 时，准备好 Webots、OpenCV C++、OpenVINO、CMake、
 
 ```bash
 git submodule update --init --recursive
-xrobot_setup
+pip install xrobot==1.0.0
+xrobot setup
 
 cmake -S . -B build/debug -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug \
@@ -193,7 +194,7 @@ run_headless_preview.py     无头 smoke test
 在开发容器中执行：
 
 ```bash
-xrobot_setup
+xrobot setup
 ```
 
 ### CMake 找不到 OpenVINO

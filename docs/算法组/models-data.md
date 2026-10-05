@@ -7,7 +7,7 @@ sidebar_position: 10
 
 # 模型与数据
 
-桌面仿真使用 `ArmorDetectorModel::OPENVINO_640X512`，模型文件在 `Modules/ArmorDetector/model/armor_detector_640x512.onnx`。
+桌面仿真使用 `ArmorDetectorModel::OPENVINO_640X512`，模型文件在 `Modules/QDU-Robomaster/ArmorDetector/model/armor_detector_640x512.onnx`。
 
 ## 模型格式
 
@@ -57,7 +57,7 @@ ArmorDetector loaded OpenVINO ... device=<DEVICE> input=640x512
 
 ```yaml
 network:
-  model: {expr: ArmorDetectorModel::OPENVINO_640X512}
+  model: ArmorDetectorModel::OPENVINO_640X512
 ```
 
 模型枚举同时决定模型文件、输出适配和推理后端。
@@ -77,13 +77,13 @@ network:
 Linux：
 
 ```bash
-sha256sum Modules/ArmorDetector/model/armor_detector_640x512.onnx
+sha256sum Modules/QDU-Robomaster/ArmorDetector/model/armor_detector_640x512.onnx
 ```
 
 PowerShell：
 
 ```powershell
-Get-FileHash .\Modules\ArmorDetector\model\armor_detector_640x512.onnx -Algorithm SHA256
+Get-FileHash .\Modules\QDU-Robomaster\ArmorDetector\model\armor_detector_640x512.onnx -Algorithm SHA256
 ```
 
 提交新模型时保留文件哈希、训练与导出来源、输入输出格式和前后处理说明，便于对照代码。

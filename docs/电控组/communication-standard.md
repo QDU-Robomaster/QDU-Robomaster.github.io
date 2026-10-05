@@ -27,18 +27,17 @@ C 板使用默认 Topic 域，Linux 接收端将这些数据放入 `host` 域。
 C 板接收侧配置：
 
 ```yaml
-- id: sharedtopic
-  name: SharedTopic
-  constructor_args:
-    uart_name: usb_otg_hs_cdc
-    buffer_size: 512
-    topic_configs:
-    - target_euler
-    - fire_notify
-    - camera_sync_command
+- module: xrobot-org/SharedTopic
+  id: sharedtopic
+  args:
+    - uart: usb_otg_hs_cdc
+    - ramfs: ramfs
+    - uart_name: "usb_otg_hs_cdc"
+    - buffer_size: 512
+    - topic_configs: '{"target_euler", "fire_notify", "camera_sync_command"}'
 ```
 
-同一配置中的 `SharedTopicClient` 负责反方向发送。FS 与 HS CDC 的用途见[外设映射](/电控组/hardware-mapping)。
+`uart` 是接收数据的串口对象，`uart_name` 是 RamFS 命令 `shared_topic:<uart_name>` 的后缀。同一配置中的 `SharedTopicClient` 负责反方向发送。FS 与 HS CDC 的用途见[外设映射](/电控组/hardware-mapping)。
 
 ## SharedTopic 的几个名字
 

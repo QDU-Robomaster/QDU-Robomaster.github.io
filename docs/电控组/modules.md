@@ -22,25 +22,24 @@ C 板的 `Modules/modules.yaml` 声明了下面这些依赖。实际运行哪些
 | `Chassis` | 底盘控制 |
 | `Gimbal`、`MiniGimbal` | 云台控制 |
 | `InfantryLauncher`、`HeroLauncher`、`Dart` | 发射机构控制 |
-| `LegVmc` | 腿部虚拟模型控制 |
 | `SuperPower`、`PowerControl` | 超级电容通信与功率控制 |
 | `Referee`、`SentryProtocol` | 裁判系统与哨兵相关协议 |
 | `HostData` | 将主机目标接入 CMD |
 | `SharedTopic`、`SharedTopicClient` | 跨设备 Topic 收发 |
 | `EventBinder` | 连接模块事件 |
 
-例如依赖清单包含 `LegVmc`，但 `wheel_leg.yaml` 目前只有 BlinkLED。各车型已经配置的内容见[机器人配置](/电控组/robot-configs)。
+表中模块是否运行由所选配置决定，例如 `wheel_leg.yaml` 目前只实例化 BlinkLED。各车型已经配置的内容见[机器人配置](/电控组/robot-configs)。
 
 ## 模块从哪里来
 
-`Modules/sources.yaml` 配置来源索引。清单中的 `xrobot-org/` 和 `qdu-future/` 是索引使用的前缀，实际仓库地址由索引解析。
+`Modules/sources.yaml` 配置来源索引。清单中的 `QDU-Robomaster/` 和 `xrobot-org/` 是模块的 owner，实际仓库地址由索引解析，每个模块使用的提交记录在 `xrobot.lock`。
 
-初始化后，模块目录通常各自带有 `.git`。查看云台模块的版本和修改：
+`xrobot setup` 把模块检出到 `Modules/<owner>/<Repo>/`，模块目录各自带有 `.git`。查看云台模块的版本和修改：
 
 ```bash
-git -C Modules/Gimbal log -1 --oneline
-git -C Modules/Gimbal status --short
-git -C Modules/Gimbal diff
+git -C Modules/QDU-Robomaster/Gimbal log -1 --oneline
+git -C Modules/QDU-Robomaster/Gimbal status --short
+git -C Modules/QDU-Robomaster/Gimbal diff
 ```
 
 功能改动提交到模块仓库，设备和参数改动提交到 BSP。添加模块、manifest 和生成器的用法见 [XRobot 工程管理](https://xrobot.work/docs/proj_man)。
