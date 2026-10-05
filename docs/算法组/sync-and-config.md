@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # 运行配置
 
-Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/RunConfig/` 中提供相机运行、文件回放和采集配置。
+Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/RunConfig/` 中提供相机运行和采集配置。
 
 ## Webots 配置
 
@@ -28,7 +28,6 @@ Webots 使用 `User/xrobot.yaml`。Linux BSP 除默认配置外，还在 `User/R
 | --- | --- | --- |
 | `User/xrobot.yaml` | Hik 相机 | 默认实体相机、自瞄和主机通信 |
 | `hik.yaml` | Hik 相机，2×2 下采样输出 720×540 | 同步、Detector、Tracker、Aimer、主机收发 |
-| `capturefile.yaml` | 1440×1080 历史视频与 IMU 文件 | 文件回放、同步、自瞄；关闭 DevC USB |
 | `sentry.yaml` | 自由运行 Hik 相机，独立标定 | 自瞄和通信，裁判输入使用 `sentry_ref` |
 | `vision_capture.yaml` | 同步相机图像 | VisionCapture 记录或标定，不运行自瞄三模块 |
 
@@ -41,19 +40,18 @@ Linux 实车配置使用 `INT16_HEAD_L`，Webots 桌面仿真使用 OpenVINO 模
 选择所需配置执行一条命令：
 
 ```bash
-python3 -m xrobot.GenerateMain --config User/RunConfig/hik.yaml --output User/xrobot_main.hpp
-python3 -m xrobot.GenerateMain --config User/RunConfig/capturefile.yaml --output User/xrobot_main.hpp
-python3 -m xrobot.GenerateMain --config User/RunConfig/sentry.yaml --output User/xrobot_main.hpp
-python3 -m xrobot.GenerateMain --config User/RunConfig/vision_capture.yaml --output User/xrobot_main.hpp
+xrobot gen -c User/RunConfig/hik.yaml
+xrobot gen -c User/RunConfig/sentry.yaml
+xrobot gen -c User/RunConfig/vision_capture.yaml
 ```
 
-省略 `--config` 时读取 `User/xrobot.yaml`。生成完成后重新编译。一个工作树共用同一份生成入口，因此一次只对应一套运行配置。
+省略 `-c` 时使用当前选中的配置，即已生成的 `User/xrobot_main.hpp` 对应的配置，尚未生成时为 `User/xrobot.yaml`。各配置 `constexprs` 段的常量生成到 `User/xrobot_main.hpp` 的 `AutoAimRunConfig` 命名空间。生成完成后重新编译；配置修改后未重新生成时，构建停止并提示运行 `xrobot gen -c <配置>`。一个工作树共用同一份生成入口，因此一次只对应一套运行配置。离线回放流程已移出 `bsp-linux-autoaim`。
 
 ## 参数位置
 
 | 参数 | 位置 |
 | --- | --- |
-| 曝光、触发、下采样 | 相机实例的 `constructor_args.runtime` |
+| 曝光、触发、下采样 | 相机实例 `args` 中的 `runtime` |
 | 同步模式、偏移和周期 | CameraFrameSync 的 `runtime` 与触发侧配置 |
 | 模型、置信度、NMS | ArmorDetector 的 `cfg.network` |
 | 跟踪与目标选择 | ArmorTracker 的 `cfg.tracker` |

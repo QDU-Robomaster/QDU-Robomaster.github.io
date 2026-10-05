@@ -16,28 +16,33 @@ sidebar_position: 2
 XRobot 和代码生成器装在自己的 Python 环境中：
 
 ```bash
-python -m pip install xrobot libxr
+python -m pip install xrobot==1.0.0 libxr==6.0.0
 ```
 
-这里的 Python 包 `libxr` 是代码生成工具。工程使用的 C++ 库通过 Git submodule 获取。
+这里的 Python 包 `libxr` 是代码生成工具。工程使用的 C++ 库通过 Git submodule 获取。两个包的版本记录在 `Modules/modules.yaml` 的 `xrobot:` 和 `User/libxr_config.yaml` 的 `generator:` 中。
 
 ## 拉取与初始化
 
 ```bash
-git clone https://github.com/QDU-Robomaster/bsp-dev-c.git
+git clone --recursive https://github.com/QDU-Robomaster/bsp-dev-c.git
 cd bsp-dev-c
-git submodule update --init --recursive
-xr_cubemx_cfg -d . --xrobot
-xrobot_setup
+xrobot setup
 ```
 
-LibXR 位于 `Middlewares/Third_Party/LibXR/`，各模块下载到 `Modules/`。初始化完成后，生成默认入口：
+LibXR 位于 `Middlewares/Third_Party/LibXR/`，各模块按 `xrobot.lock` 中的提交检出到 `Modules/<owner>/<Repo>/`。`xrobot setup` 同时检查所有配置，并由默认配置 `User/xrobot.yaml` 生成入口 `User/xrobot_main.hpp`：
 
-```bash
-xrobot_gen_main --config User/xrobot.yaml
+```yaml
+modules:
+  - module: xrobot-org/BlinkLED
+    id: blink_led
+    args:
+      - led: LED_B
+      - blink_cycle: 250
+settings:
+  monitor_sleep_ms: 1000
 ```
 
-默认配置创建 `BlinkLED`，`blink_cycle` 为 250。生成的入口是 `User/xrobot_main.hpp`。
+默认配置创建 `BlinkLED` 实例 `blink_led`，`blink_cycle` 为 250。`LED_B` 是 `User/app_main.cpp` 中用 `XR_REGISTER` 注册的 GPIO。配置格式见 [XRobot 文档](https://xrobot.work/docs/proj_man/proj-man-config)。
 
 ## 编译
 
@@ -74,9 +79,9 @@ build/debug/DevC.bin
 整车配置另放在 `User/RobotConfig/`，例如：
 
 ```bash
-xrobot_gen_main --config User/RobotConfig/omni_infantry_3.yaml
+xrobot gen -c User/RobotConfig/omni_infantry_3.yaml
 ```
 
-各份文件的用途见[机器人配置](/电控组/robot-configs)。
+之后运行的 `xrobot gen` 和 `xrobot setup` 沿用这次选择的配置。各份文件的用途见[机器人配置](/电控组/robot-configs)。
 
 源码：[bsp-dev-c](https://github.com/QDU-Robomaster/bsp-dev-c)。

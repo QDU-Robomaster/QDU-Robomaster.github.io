@@ -94,10 +94,10 @@ Aimer 输出 `host/target_euler`。实车上这组目标值交给下位机执行
 | `webots/worlds/auto_aim_test_field_target_vehicle_camera_preview.wbt` | 主测试场景 |
 | `webots/protos/` | 目标车、装甲板等 PROTO |
 | `webots/controllers/forced_target_simple/forced_target_simple.py` | 目标运动脚本 |
-| `Modules/WebotsCamera/` | 图像与 IMU 输入 |
-| `Modules/WebotsGimbal/` | 云台模型接口 |
-| `Modules/WebotsFireNotify/` | 发射机构接口 |
-| `Modules/WebotsReferee/` | 裁判信息接口 |
+| `Modules/QDU-Robomaster/WebotsCamera/` | 图像与 IMU 输入 |
+| `Modules/QDU-Robomaster/WebotsGimbal/` | 云台模型接口 |
+| `Modules/QDU-Robomaster/WebotsFireNotify/` | 发射机构接口 |
+| `Modules/QDU-Robomaster/WebotsReferee/` | 裁判信息接口 |
 | `run_headless_preview.py` | 无头回归测试 |
 
 ## GUI 与无头运行

@@ -11,13 +11,14 @@ sidebar_position: 12
 
 | 现象 | 处理 |
 | --- | --- |
-| `Missing modules` | 在工程根目录执行 `xrobot_setup` |
-| `xrobot_setup: command not found` | 检查 XRobot 是否安装到当前 Python 环境，`python3 -m pip show xrobot` |
+| `Missing modules` | 在工程根目录执行 `xrobot setup` |
+| `xrobot: command not found` | 检查 XRobot 是否安装到当前 Python 环境，`python3 -m pip show xrobot`；版本与 `Modules/modules.yaml` 的 `xrobot:` 一致 |
+| `User/xrobot_main.hpp is stale` | 配置修改后入口过期，按提示执行 `xrobot gen -c <配置>` 后重新 build |
 | 找不到 OpenVINO | 安装 C++ Runtime，并设置包含 `OpenVINOConfig.cmake` 的 `OpenVINO_DIR` |
 | 找不到 OpenCV | 安装 C++ 开发库，必要时设置 `OpenCV_DIR`；Python `cv2` 不能替代 C++ 库 |
 | 找不到 Webots 头文件或库 | 检查 `WEBOTS_HOME` 和 Webots controller SDK |
 | 脚本出现 `bash\r` 或 `^M` | 将 shell 脚本换行格式改为 LF |
-| YAML 修改后接口编译错误 | 先看生成的 XRobot 接口与模块版本是否匹配，再重新 build |
+| YAML 修改后接口编译错误 | 先看生成的 XRobot 接口与模块版本是否匹配，执行 `xrobot gen` 后再重新 build |
 
 ## VS Code 连不上开发容器
 

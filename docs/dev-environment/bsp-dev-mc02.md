@@ -15,24 +15,23 @@ STM32 编译环境按 XRobot 官方 STM32 环境配置处理；MC02 工程初始
 ## 基本流程
 
 ```bash
-git submodule update --init --recursive
-pip install libxr xrobot
-xr_cubemx_cfg -d ./ --xrobot
-
-xrobot_src_man create-sources
-xrobot_init_mod \
-  --config https://raw.githubusercontent.com/QDU-Robomaster/dev-c-robots/refs/heads/main/test.yaml \
-  --dir ./Modules
-
-xrobot_setup
+git clone --recursive https://github.com/QDU-Robomaster/bsp-dev-mc02.git
+cd bsp-dev-mc02
+pip install xrobot==1.0.0 libxr==6.0.0
+xrobot setup
+cmake --preset Debug
+cmake --build --preset Debug
 ```
+
+`xrobot setup` 按 `xrobot.lock` 中的提交检出模块、检查配置并生成 `User/xrobot_main.hpp`。在 CubeMX 中修改并重新生成代码后，运行 `libxr stm32 setup` 更新 `User/app_main.cpp`、`User/app_main.h`、`User/flash_map.hpp`、`User/libxr_config.yaml` 和 `cmake/LibXR.CMake`，`User Code` 区域保留。
 
 ## 与 `bsp-dev-c` 的差异
 
-1. `bsp-dev-mc02` 需要执行 `xrobot_src_man create-sources`。
-2. 模块初始化来源是 `QDU-Robomaster/dev-c-robots` 的 `test.yaml`。
+1. `bsp-dev-mc02` 只有 `User/xrobot.yaml` 一份配置，`xrobot setup` 直接由它生成 `User/xrobot_main.hpp`。
+2. CMake 预设为 `Debug` 和 `Release`，产物为 `build/<预设>/CtrBoard-H7_ALL.elf`。
 
 官方文档：
 
 1. [STM32 环境配置](https://xrobot.work/docs/env_setup/env-setup-stm32)
 2. [STM32 代码生成](https://xrobot.work/docs/code_gen/stm32)
+3. [配置格式](https://xrobot.work/docs/proj_man/proj-man-config)

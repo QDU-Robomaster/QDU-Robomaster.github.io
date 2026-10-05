@@ -52,7 +52,7 @@ bash tools/format_code.sh
 
 电机型号、ID、总线、反向、PID 和几何参数写在机器人 YAML。模块只实现通用功能。
 
-新增构造参数时，同步修改 manifest 和使用它的配置。改完 YAML 后重新生成 `User/xrobot_main.hpp`，不直接维护生成头文件。
+新增构造参数时，在模块构造函数中声明，并同步修改使用它的配置；配置按参数名填写。改完 YAML 后运行 `xrobot gen` 重新生成 `User/xrobot_main.hpp`，不直接维护生成头文件。
 
 CubeMX 生成文件只在用户代码区添加应用代码，厂商驱动保持原样。板级对象和逻辑名称放在 `User/app_main.cpp`。
 
