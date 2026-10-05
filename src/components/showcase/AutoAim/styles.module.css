@@ -1,0 +1,207 @@
+/* AutoAim：只用 XRobot Style token；直角、1 px 线、无阴影、无渐变。宽度随容器（container query），窄屏单列。 */
+.root {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.root *,
+.root *::before,
+.root *::after { box-sizing: border-box; }
+
+/* ---- 链路：ArmorDetector → ArmorTracker → Aimer */
+.pipe { order: 2; display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--line); }
+.main { order: 1; }
+.chip { position: relative; min-width: 0; padding: 8px 12px; border-top: 1px solid var(--line); }
+.chip:first-child { border-top: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; min-height: 20px; }
+.name { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+.topic { font-family: var(--font-mono); font-size: 11px; line-height: 16px; color: var(--ink-muted); overflow-wrap: anywhere; }
+.state { margin-left: auto; font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+.l1 { min-height: 22px; font-size: 14px; line-height: 22px; overflow-wrap: anywhere; }
+.l2 { min-height: 18px; font-family: var(--font-mono); font-size: 11px; line-height: 18px; color: var(--ink-muted); overflow-wrap: anywhere; }
+.l1 b { font-family: var(--font-mono); font-weight: 700; }
+
+.gOk, .gNo, .gNa { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; white-space: nowrap; }
+.gOk::before, .gNo::before, .gNa::before { content: ''; display: inline-block; width: 8px; height: 8px; border: 1px solid var(--ink); }
+.gOk { color: var(--ink); }
+.gOk::before { background: var(--ink); }
+.gNo::before { background: transparent; }
+.gNa { opacity: 0.55; }
+.gNa::before { border-style: dashed; }
+.why { color: var(--ink); }
+
+@container (min-width: 720px) {
+  .pipe { order: 0; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr); border-top: 0; border-bottom: 1px solid var(--line); }
+  .chip { border-top: 0; border-left: 1px solid var(--line); }
+  .chip:first-child { border-left: 0; }
+  .chip + .chip::before { content: '\2192'; position: absolute; left: -7px; top: 8px; width: 14px; text-align: center; line-height: 20px; background: var(--paper-raised); color: var(--ink-muted); font-family: var(--font-mono); font-size: 13px; }
+}
+
+/* ---- 主体 */
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'top' 'cap' 'ctl' 'side';
+}
+.top { grid-area: top; margin: 0; display: flex; flex-direction: column; min-width: 0; }
+.side { grid-area: side; display: flex; flex-direction: column; min-width: 0; border-top: 1px solid var(--line); }
+.ctl { grid-area: ctl; border-top: 1px solid var(--line); }
+.cap { grid-area: cap; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; padding: 6px 12px; min-height: 52px; border-top: 1px solid var(--line); font-size: 13px; line-height: 20px; }
+.cap p { margin: 0; flex: 1 1 360px; min-width: 0; }
+
+.sceneWrap { position: relative; width: 100%; aspect-ratio: 1 / 0.92; min-height: 280px; background: var(--paper-raised); }
+.topCard { margin: 0; border-top: 1px solid var(--line); }
+.topWrap { position: relative; width: 100%; aspect-ratio: 1.68 / 1; background: var(--paper-sunken); overflow: hidden; }
+.cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: hidden; }
+.tag { position: absolute; left: 8px; top: 6px; font-family: var(--font-mono); font-size: 10px; line-height: 14px; color: var(--ink-muted); pointer-events: none; }
+.hint {
+  position: absolute; right: 8px; top: 6px; padding: 0 6px; border: 1px solid var(--line-strong); background: var(--paper-raised);
+  font-family: var(--font-mono); font-size: 11px; line-height: 18px; color: var(--ink); pointer-events: none;
+}
+
+/* ---- SVG 里用到的类（由 scene.ts 拼进字符串） */
+.fan { fill: var(--paper-sunken); stroke: var(--line-strong); stroke-width: 1; }
+.gl { fill: none; stroke: var(--line); stroke-width: 1; }
+.glS { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+.lab { fill: var(--ink-muted); font-family: var(--font-mono); font-size: 10px; paint-order: stroke; stroke: var(--paper-sunken); stroke-width: 3px; stroke-linejoin: round; }
+.labI { fill: var(--ink); font-family: var(--font-mono); font-size: 11px; font-weight: 700; paint-order: stroke; stroke: var(--paper-raised); stroke-width: 3px; stroke-linejoin: round; }
+.labP { fill: var(--ch2); font-family: var(--font-mono); font-size: 11px; font-weight: 700; paint-order: stroke; stroke: var(--paper-raised); stroke-width: 3px; stroke-linejoin: round; }
+.route { fill: none; stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.7; }
+.ring { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+.est { fill: none; stroke: var(--ch1); stroke-width: 1.2; }
+.sight { fill: none; stroke: var(--ink); stroke-width: 1; stroke-dasharray: 1 3; opacity: 0.6; }
+.arc { fill: none; stroke: var(--ink); stroke-width: 1.3; stroke-dasharray: 5 3; }
+.arcG { fill: none; stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.45; }
+.fo { stroke: var(--ink); stroke-opacity: 0.75; stroke-width: 0.7; stroke-linejoin: round; }
+.fa { fill: var(--team-accent); stroke: var(--ink); stroke-opacity: 0.75; stroke-width: 0.6; stroke-linejoin: round; }
+.fb { fill: var(--ink); stroke: var(--paper-raised); stroke-width: 0.5; stroke-linejoin: round; }
+.fd { fill: var(--ink); fill-opacity: 0.78; }
+.fl { fill: var(--ink); stroke: var(--paper-raised); stroke-width: 0.5; }
+.seen { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
+.pred { fill: none; stroke: var(--ch2); stroke-width: 1.2; stroke-dasharray: 4 3; stroke-linejoin: round; }
+.predSel { fill: var(--ch2); fill-opacity: 0.14; stroke: var(--ch2); stroke-width: 2; stroke-linejoin: round; }
+.predArc { fill: none; stroke: var(--ch2); stroke-width: 1.3; opacity: 0.7; }
+.cross { fill: none; stroke: var(--ch2); stroke-width: 1.6; }
+.shot { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.shotDot { fill: var(--ink); }
+.shotSh { fill: var(--ink); opacity: 0.22; }
+.mark { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+.markDot { fill: var(--ink); }
+.miss { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+.tGrid { fill: none; stroke: var(--line); stroke-width: 1; }
+.tRay { fill: none; stroke: var(--team-accent); stroke-width: 1.6; }
+.tCar { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+.tPlate { fill: none; stroke: var(--ink-muted); stroke-width: 3; }
+.tPlateSeen { fill: none; stroke: var(--ink); stroke-width: 3; }
+.tBar { fill: var(--ink); stroke: var(--paper-sunken); stroke-width: 0.6; }
+.tVel { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.tSeen { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.tPred { fill: none; stroke: var(--ch2); stroke-width: 1.3; stroke-dasharray: 4 3; }
+.tSel { fill: none; stroke: var(--ch2); stroke-width: 2; }
+.tTri { fill: var(--team-accent); }
+
+/* 目标的抓手：一个虚线方框，跟着目标走；触摸时只在框内拦手势 */
+.handle {
+  position: absolute; left: 0; top: 0; width: 80px; height: 80px;
+  outline: 1px dashed var(--line-strong); outline-offset: 0;
+  background: transparent; cursor: grab; touch-action: none; will-change: transform;
+}
+.handle:hover { outline: 1px solid var(--ink); }
+.handle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.handle[data-held] { outline: 2px solid var(--ink); cursor: grabbing; }
+
+.legend {
+  display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 0; padding: 6px 12px; border-top: 1px solid var(--line);
+  font-size: 12px; line-height: 18px; color: var(--ink-muted);
+}
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.swInk { stroke: var(--ink); stroke-width: 2; }
+.swCh1 { stroke: var(--ch2); stroke-width: 1.6; }
+.swRay { stroke: var(--ink); stroke-width: 1.2; fill: none; }
+.swFill { fill: var(--ink); }
+.swEst { fill: none; stroke: var(--ch1); stroke-width: 1.2; }
+
+.cam { margin: 0; }
+.camWrap { position: relative; width: 100%; aspect-ratio: 1.9 / 1; background: var(--paper-sunken); }
+.budWrap { min-width: 0; border-top: 1px solid var(--line); }
+.budget { padding: 6px 12px 8px; }
+.budget svg { display: block; max-width: 100%; overflow: visible; }
+.svgMut { fill: var(--ink-muted); font-family: var(--font-mono); font-size: 10px; }
+.svgInk { fill: var(--ink); font-family: var(--font-mono); font-size: 11px; }
+.flight { stroke: var(--ink); stroke-width: 1; }
+.hatch { stroke: var(--ink); stroke-width: 1; }
+.brk { stroke: var(--ink); stroke-width: 1; fill: none; }
+.note { margin: 4px 0 0; min-height: 18px; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
+.note b { color: var(--ink); font-family: var(--font-mono); font-weight: 700; }
+
+/* ---- 控制 */
+.ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; padding: 6px 12px; }
+.field { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.lab { font-size: 12px; color: var(--ink-muted); }
+.val { min-width: 8.5em; font-family: var(--font-mono); font-size: 12px; }
+.field input[type='range'] { width: 150px; max-width: 100%; height: 32px; margin: 0; accent-color: var(--ink); }
+.field input[type='range']:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.btn {
+  min-height: 36px; min-width: 36px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 0;
+  background: var(--paper-raised); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer;
+}
+.btn:hover { background: var(--paper-sunken); }
+.btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.btnPrimary { background: var(--ink); color: var(--on-ink); font-weight: 700; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
+.btnPrimary:hover { background: var(--ink); opacity: 0.88; }
+.btnPrimary:focus-visible { outline: 2px solid var(--on-ink); outline-offset: -4px; }
+
+.seg { display: inline-flex; }
+.seg button {
+  min-height: 36px; padding: 0 12px; margin-left: -1px; border: 1px solid var(--ink); border-radius: 0;
+  background: var(--paper-raised); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer;
+}
+.seg button:first-child { margin-left: 0; }
+.seg button[aria-pressed='true'] { background: var(--ink); color: var(--on-ink); font-weight: 700; }
+.seg button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; position: relative; }
+
+.rates { display: grid; grid-template-columns: auto minmax(60px, 1fr) auto; column-gap: 8px; row-gap: 2px; align-items: center; min-width: 240px; flex: 1 1 260px; max-width: 420px; font-size: 12px; line-height: 16px; }
+.ratesT { grid-column: 1 / -1; color: var(--ink-muted); }
+.rrow { display: contents; }
+.rname { white-space: nowrap; }
+.rrow[data-on] .rname { font-weight: 700; }
+.bar { display: block; height: 8px; border: 1px solid var(--line-strong); background: var(--paper-sunken); }
+.fill { display: block; height: 100%; background: var(--ink); }
+.rrow:not([data-on]) .fill { background: var(--ink-muted); }
+.rv { font-family: var(--font-mono); white-space: nowrap; text-align: right; min-width: 7em; }
+.rs { color: var(--ink-muted); }
+
+.doc { margin-left: auto; font-size: 13px; flex: none; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.doc:hover { color: var(--ink); text-decoration-thickness: 2px; }
+.doc:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---- 桌面：两栏 */
+@container (min-width: 720px) {
+  .main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'top' 'side' 'ctl' 'cap';
+  }
+  .side { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+  .side > * { border-top: 0; border-left: 1px solid var(--line); min-width: 0; }
+  .side > :first-child { border-left: 0; }
+  .topWrap, .camWrap { aspect-ratio: 1.9 / 1; }
+  .sceneWrap { aspect-ratio: 2.5 / 1; min-height: 360px; }
+  .cap { min-height: 30px; padding: 4px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .seg button { transition: none; }
+}

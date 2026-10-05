@@ -1,0 +1,30 @@
+/* 未来战队的强调色，叠在 XRobot Style token（xrstyle-tokens.css）之上。
+ *
+ * 来源：战队 Logo 是单色墨（#231815 一类的暖黑），没有可取的彩色；它本身正好落在 XRobot 的 ink 上。
+ * 强调色沿用旧首页的主色 #39C5BB（旧 hero 渐变的起点色），队员看到它就认得出是这个站。
+ * 暗色主题直接用 #39C5BB；亮色纸面上它只有 1.7:1，所以加深到够用为止。
+ *
+ * --team-accent      图形：灯条、2px 标记线、战队标识的边。对本主题三种 paper ≥ 3:1。
+ * --team-accent-ink  文字：战队相关的短标签。对本主题三种 paper ≥ 4.5:1。
+ *
+ *                       paper   paper-raised   paper-sunken
+ *   亮 accent  #1d8f86   3.5      3.9            3.2
+ *   亮 ink     #0b6f66   5.4      6.0            4.9
+ *   暗 accent  #39c5bb   9.1      8.4            9.4
+ *   暗 ink     #5ad3c9  10.7      9.9           11.0
+ *
+ * 用法限制：
+ * - 少量点缀：导航栏战队标识两侧的灯条、兵种卡的装甲板、己方装甲灯条。不用在按钮、链接、正文标题和大面积底色上。
+ * - 不在 --team-accent 底上放字（亮色下 ink 只有 4.7:1，暗色下要换成 paper，两套规则容易写错）。
+ * - 它和数据通道色 --ch1 同在青色区（色相 175° 对 187°）。小部件里己方标识用实心块加 ink 描边，ch1 只画数据线，两者不要挨着放。
+ */
+:root,
+html[data-theme='light'] {
+  --team-accent: #1d8f86;
+  --team-accent-ink: #0b6f66;
+}
+
+html[data-theme='dark'] {
+  --team-accent: #39c5bb;
+  --team-accent-ink: #5ad3c9;
+}

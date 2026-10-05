@@ -1,0 +1,689 @@
+/* SimVsReal：只用 XRobot Style 的 token。直角、1 px 线、无阴影、无渐变。
+   实车一路用通道色 ch0，仿真一路用 ch1；丢帧用 fail。 */
+
+.root {
+  --lane-real: var(--ch0);
+  --lane-sim: var(--ch1);
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px 14px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: left;
+}
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+.laneReal {
+  --lane: var(--lane-real);
+}
+.laneSim {
+  --lane: var(--lane-sim);
+}
+
+
+/* ------------------------------------------------------------------ 主画面（SVG） */
+.stage {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+}
+.svg text {
+  font-family: var(--font-sans);
+  fill: var(--ink);
+}
+.end {
+  text-anchor: end;
+}
+.headBar {
+  fill: var(--lane);
+}
+.headTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+.headRepo {
+  font-family: var(--font-mono) !important;
+  font-size: 11px;
+}
+.headSub {
+  font-size: 10.5px;
+  fill: var(--ink-muted) !important;
+}
+
+/* 地板和机器 */
+.slabTop {
+  fill: color-mix(in srgb, var(--ink) 7%, var(--paper-raised));
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.slabL {
+  fill: color-mix(in srgb, var(--ink) 30%, var(--paper-raised));
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.slabR {
+  fill: color-mix(in srgb, var(--ink) 18%, var(--paper-raised));
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.mark,
+.markDash {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  opacity: 0.8;
+}
+.markDash {
+  stroke-dasharray: 3 3;
+}
+.grid {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 0.8;
+  opacity: 0.6;
+}
+.slabLine {
+  fill: none;
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.simRig[data-state='wait'] .slabLine,
+.simRig[data-state='pause'] .slabLine {
+  stroke-dasharray: 5 3;
+}
+.simRig[data-state='pause'] .wf {
+  opacity: 0.55;
+}
+.fs {
+  fill: currentColor;
+  stroke: var(--ink);
+  stroke-opacity: 0.38;
+  stroke-width: 0.5;
+  stroke-linejoin: round;
+}
+.fc {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+.fd {
+  fill: currentColor;
+  stroke: none;
+}
+.fl {
+  fill: var(--fail);
+  stroke: var(--ink);
+  stroke-opacity: 0.45;
+  stroke-width: 0.5;
+  stroke-linejoin: round;
+}
+.wf {
+  fill: none;
+  stroke: var(--ink-muted);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.wl {
+  fill: none;
+  stroke: var(--fail);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+
+/* 连线 */
+.conn {
+  fill: none;
+  stroke: var(--lane);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+.drop {
+  stroke: var(--lane);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.75;
+}
+.mkReal {
+  fill: var(--lane-real);
+}
+.mkSim {
+  fill: var(--lane-sim);
+}
+.cap {
+  font-size: 11px;
+  text-anchor: middle;
+  fill: var(--ink-muted) !important;
+}
+
+/* 共用模块塔 */
+.tile,
+.chip {
+  cursor: pointer;
+  outline: none;
+}
+.tFront {
+  fill: var(--paper-raised);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+.tTop {
+  fill: var(--paper-sunken);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.tSide {
+  fill: color-mix(in srgb, var(--ink) 16%, var(--paper-sunken));
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.tName {
+  font-family: var(--font-mono) !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.tSub {
+  font-size: 10.5px;
+  text-anchor: middle;
+  fill: var(--ink-muted) !important;
+}
+.lamp {
+  fill: var(--lane);
+  opacity: 0.2;
+}
+.tile:hover .tFront,
+.chip:hover .chipBody {
+  stroke: var(--ink);
+}
+.tile[aria-pressed='true'] .tFront {
+  stroke: var(--ink);
+  stroke-width: 2;
+  fill: var(--paper-sunken);
+}
+.tile[aria-pressed='true'] .tName,
+.chip[aria-pressed='true'] .chipName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tile:focus-visible .tFront,
+.chip:focus-visible .chipBody {
+  stroke: var(--focus);
+  stroke-width: 2.5;
+}
+
+/* 适配模块 */
+.chipBody {
+  fill: var(--paper-raised);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+.chipBar {
+  fill: var(--lane);
+}
+.chipName {
+  font-family: var(--font-mono) !important;
+  font-size: 11px;
+  font-weight: 600;
+}
+.chipSub {
+  font-size: 10px;
+  fill: var(--ink-muted) !important;
+}
+.chip[aria-pressed='true'] .chipBody {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  fill: var(--paper-sunken);
+}
+
+/* 两只时钟 */
+.clockBg {
+  fill: var(--paper-raised);
+  stroke: none;
+}
+.dialRing {
+  fill: var(--paper);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+.clock[data-state='wait'] .dialRing,
+.clock[data-state='pause'] .dialRing {
+  stroke-dasharray: 3 3;
+  stroke: var(--ink);
+}
+.dialTick {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+.dialHand {
+  stroke: var(--lane);
+  stroke-width: 2;
+}
+.dialHub {
+  fill: var(--ink);
+}
+.clockLabel {
+  font-size: 11px;
+  font-weight: 600;
+}
+.clockVal {
+  font-family: var(--font-mono) !important;
+  font-size: 12px;
+}
+.clockSub {
+  font-size: 10px;
+  fill: var(--ink-muted) !important;
+}
+
+/* 相机卡 */
+.card {
+  position: absolute;
+  min-width: 0;
+}
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  height: 16px;
+  font-size: 11px;
+  line-height: 14px;
+}
+.cardHead b {
+  font-weight: 600;
+  border-left: 3px solid var(--lane);
+  padding-left: 6px;
+}
+.cardHead span {
+  color: var(--ink-muted);
+}
+.cv {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--paper-sunken);
+  border: 1px solid var(--line-strong);
+}
+
+/* 统计 */
+.stats {
+  position: absolute;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 8px;
+  align-content: start;
+  min-width: 0;
+  margin: 0;
+}
+.stats dt {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+.stats dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.stats .failVal {
+  color: var(--fail);
+  font-weight: 700;
+}
+.stats .wide {
+  grid-column: 1 / -1;
+}
+.pool {
+  display: inline-flex;
+  gap: 4px;
+  vertical-align: middle;
+}
+.slot {
+  width: 14px;
+  height: 12px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+}
+.slot[data-state='queued'] {
+  background: var(--lane);
+  opacity: 0.45;
+  border-color: var(--lane);
+}
+.slot[data-state='detecting'] {
+  background: var(--lane);
+  border-color: var(--lane);
+}
+.pool[data-flash='1'] .slot {
+  border-color: var(--fail);
+}
+.ledgerWrap {
+  grid-column: 1 / -1;
+  margin-top: 3px;
+}
+.ledger {
+  display: block;
+  width: 100%;
+  height: 14px;
+}
+
+
+/* ------------------------------------------------------------------ 下半：滑块 / 暂停 / 说明，和模块说明 */
+.bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.bottom[data-narrow='true'] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.ctl {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.ctlHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ctlLabel {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+.ctlVal {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rangeWrap {
+  position: relative;
+}
+.range {
+  display: block;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--line-strong);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 22px;
+  margin-top: -10px;
+  background: var(--ink);
+  border: 0;
+  border-radius: 0;
+}
+.range::-moz-range-track {
+  height: 2px;
+  background: var(--line-strong);
+}
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 22px;
+  background: var(--ink);
+  border: 0;
+  border-radius: 0;
+}
+.range:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.thr {
+  position: absolute;
+  top: 3px;
+  left: calc(7px + (100% - 14px) * 0.13333);
+  width: 1px;
+  height: 18px;
+  background: var(--ink);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 12px;
+}
+.ctlRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.btn {
+  min-height: var(--size-control, 36px);
+  margin: 0;
+  padding: 0 14px;
+  background: var(--paper-raised);
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--paper-sunken);
+}
+.btn[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.autoTag {
+  padding: 1px 6px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-muted);
+  font-size: 11px;
+  line-height: 14px;
+}
+.says {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 18px;
+}
+.says b {
+  font-weight: 700;
+}
+
+.detail {
+  min-width: 0;
+  min-height: 172px;
+  padding: 8px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.dHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.dTitle {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+}
+.tag {
+  padding: 0 6px;
+  border: 1px solid var(--ink);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 700;
+}
+.tagSide {
+  border-color: var(--line-strong);
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+.dRole {
+  margin: 0 0 5px;
+  color: var(--ink-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+.cfg {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  line-height: 15px;
+}
+.cfgCell {
+  min-width: 0;
+  padding: 2px 6px 2px 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.cfgKey {
+  color: var(--ink-muted);
+}
+.cfgHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 5px;
+  font-family: var(--font-sans);
+}
+.cfgHead b {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.cfgHead b::before {
+  content: '';
+  flex: none;
+  width: 3px;
+  height: 11px;
+  background: var(--lane);
+}
+.cfgPath {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.cfgDiff {
+  font-weight: 700;
+}
+.facts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  line-height: 15px;
+}
+.facts li {
+  padding: 3px 0;
+  border-bottom: 1px solid var(--line);
+}
+.factKey {
+  color: var(--ink-muted);
+}
+.dLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 18px;
+}
+.dLinks a {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.dLinks a:hover {
+  text-decoration-thickness: 2px;
+}
+.dLinks a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 窄屏里说明表格：键一行，两个值并排 */
+.bottom[data-narrow='true'] .cfg {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.bottom[data-narrow='true'] .cfgKeyRow {
+  grid-column: 1 / -1;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.bottom[data-narrow='true'] .cfgHeadBlank {
+  display: none;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 窄屏里说明不要留空 */
+.bottom[data-narrow='true'] .detail {
+  min-height: 0;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
