@@ -1,0 +1,50 @@
+/* Team mark and armour plate. Tokens only (xrstyle-tokens.css, team-tokens.css). */
+
+.mark {
+  display: block;
+  flex: none;
+  color: var(--ink);
+}
+
+.plate {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: none;
+}
+
+.bar {
+  flex: none;
+  width: var(--space-1);
+  background: var(--team-accent);
+}
+
+.face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: var(--paper-raised);
+  border: var(--stroke) solid var(--line-strong);
+  color: var(--ink);
+}
+
+.plateS .face {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 var(--space-2);
+  font: 700 20px/28px var(--font-sans);
+}
+
+.plateS .bar {
+  height: 28px;
+}
+
+.plateL .face {
+  height: 72px;
+  padding: var(--space-3) var(--space-4);
+}
+
+.plateL .bar {
+  height: 48px;
+}

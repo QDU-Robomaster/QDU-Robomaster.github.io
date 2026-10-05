@@ -1,0 +1,444 @@
+/* Home page. XRobot Style tokens only (xrstyle-tokens.css, team-tokens.css); section layout lives in
+ * src/components/showcase/showcase.module.css. */
+
+.page {
+  background: var(--paper);
+}
+
+.container {
+  max-width: var(--measure-page);
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+/* ---- Hero ---- */
+
+.hero {
+  padding: var(--space-12) 0 var(--space-12);
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  gap: var(--space-12);
+  align-items: start;
+}
+
+.heroCopy {
+  min-width: 0;
+}
+
+.heroBrand {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.display {
+  margin: var(--space-6) 0 var(--space-2);
+  font-size: var(--type-display-size);
+  line-height: var(--type-display-line);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.lead {
+  margin: 0 0 var(--space-3);
+  font-size: var(--type-heading-size);
+  line-height: var(--type-heading-line);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.teamName {
+  color: var(--team-accent-ink);
+}
+
+.heroBody {
+  max-width: var(--measure-prose);
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.quick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--paper-raised);
+  border: var(--stroke) solid var(--line);
+}
+
+.quickList,
+.anchorList {
+  list-style: none;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-4);
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+}
+
+.anchorList {
+  margin-bottom: 0;
+}
+
+.quickList a,
+.anchorList a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+}
+
+.lineup {
+  margin-top: var(--space-8);
+}
+
+.lineupBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+/* ---- Robot cards ---- */
+
+/* Flex rather than grid: five cards fill 3 + 2 rows without an empty slot. */
+.robotGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.robotCard {
+  flex: 1 1 320px;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.robotHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.robotName {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.robotFacts {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+}
+
+.robotFacts dt {
+  font: 700 12px/22px var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.robotFacts dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.robotFacts code,
+.command {
+  font-size: 12px;
+  line-height: 20px;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: 0;
+  background: var(--paper-sunken);
+  overflow-wrap: anywhere;
+}
+
+.robotFiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  align-self: center;
+}
+
+.robotOther {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--ink-muted);
+}
+
+.robotModules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  padding-top: 1px;
+}
+
+.command {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+}
+
+.robotLinks {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-4);
+  margin: auto 0 0;
+  padding: 0;
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+}
+
+.robotLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+}
+
+.caption {
+  margin: var(--space-4) 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-muted);
+}
+
+.caption code {
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+/* ---- Auto-aim panels ---- */
+
+.panels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+
+/* ---- Team: environments and Git ---- */
+
+.subhead {
+  margin-bottom: var(--space-6);
+  padding-top: var(--space-8);
+  border-top: var(--stroke) solid var(--line);
+}
+
+.subTitle {
+  margin: 0 0 var(--space-2);
+  font-size: var(--type-heading-size);
+  line-height: var(--type-heading-line);
+  font-weight: 700;
+}
+
+.subBody {
+  max-width: var(--measure-prose);
+  margin: 0 0 var(--space-3);
+  color: var(--ink);
+}
+
+.subBody code,
+.envGrid code {
+  font-size: 12px;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: 0;
+  background: var(--paper-sunken);
+  overflow-wrap: anywhere;
+}
+
+.envGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.envCard {
+  min-width: 0;
+}
+
+.envTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+.git {
+  display: grid;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  gap: var(--space-12);
+  align-items: start;
+  margin-top: var(--space-12);
+  padding-top: var(--space-8);
+  border-top: var(--stroke) solid var(--line);
+}
+
+.gitCopy {
+  min-width: 0;
+}
+
+.branches {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--paper-sunken);
+  border: var(--stroke) solid var(--line);
+  font: 400 14px/28px var(--font-mono);
+}
+
+.branches code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+/* ---- More: framework, organisation, versions ---- */
+
+.moreGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+.moreCard {
+  min-width: 0;
+}
+
+.moreMark {
+  display: flex;
+  height: 32px;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  color: var(--ink);
+}
+
+.host {
+  margin-top: auto;
+  font: 700 12px/16px var(--font-mono);
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+
+.versions {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+}
+
+.versions th,
+.versions td {
+  padding: var(--space-1) 0;
+  border: 0;
+  border-top: var(--stroke) solid var(--line);
+  background: transparent;
+  text-align: left;
+}
+
+.versions thead th {
+  border-top: 0;
+  font: 700 12px/16px var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.versions thead,
+.versions tr,
+.versions tbody tr:nth-child(n) {
+  background: transparent;
+  border: 0;
+}
+
+.versions td:last-child,
+.versions th:last-child {
+  text-align: right;
+}
+
+.sha {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* ---- Narrow screens ---- */
+
+@media (max-width: 1100px) {
+  .envGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .moreGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .versionCard {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 996px) {
+  .container {
+    padding: 0 var(--space-4);
+  }
+
+  .hero {
+    padding: var(--space-8) 0 var(--space-12);
+  }
+
+  .heroGrid,
+  .git {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+
+  .panels {
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 720px) {
+  .envGrid,
+  .moreGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .robotGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .display {
+    font-size: var(--type-title-size);
+    line-height: var(--type-title-line);
+  }
+}
+
+.envCard .robotLinks {
+  margin-top: 0;
+}
